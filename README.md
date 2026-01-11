@@ -241,7 +241,7 @@ For licensing inquiries, please contact: licensing@konecbo.com
 
 Ready to transform how you collaborate on research?
 
-**[Join Our Konecbo !](https://konecbo.com)**
+**[Join Konecbo!](https://konecbo.com)**
 
 Together, we're building the future of research collaboration.
 
