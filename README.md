@@ -8,7 +8,7 @@
 
 **Konecbo** is a secure platform for researchers to connect, collaborate, and ensure ideas are protected and contributions recognised.
 
-[Join Waitlist](#) • [Learn More](#features) • [Documentation](#documentation)
+[Join Konecbo](https://konecbo.com) • [Learn More](https://konecbo.com/learn-more) • [Documentation](https://konecbo.com/#)
 
 ---
 
