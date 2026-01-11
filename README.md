@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Konecbo Logo](public/konecbo-logo.png)
+![Konecbo Logo](public/logo.png)
 
 ### Connecting Researchers. Accelerating Trusted Co-Creation.
 
