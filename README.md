@@ -1,0 +1,105 @@
+
+---
+
+# Konecbo – Research Collaboration Platform
+
+[![codecov](https://codecov.io/gh/iamprist/University-Research-Collaboration-Platform/branch/skeletoncode/graph/badge.svg?token=EIG69HYXA7)](https://codecov.io/gh/iamprist/University-Research-Collaboration-Platform)
+
+**Konecbo** is a global platform designed exclusively for researchers seeking meaningful collaboration. Whether you're launching groundbreaking research or looking to contribute your expertise to innovative projects, Konecbo connects you with the right people at the right time. The platform connects researchers worldwide, facilitates project management, and provides real-time communication and collaboration tools.
+
+**How to run Konecbo on your local machine**: npm install (to install all dependencies)
+                                      npm start (to run on localhost)
+                                      To check for coverage, use:
+                                      npx jest--coverage
+
+> Developed for the **COMS3003A Software Design** course at the **University of the Witwatersrand**, 2025.
+
+---
+
+##  Objectives
+
+* Centralize research collaboration in a single platform
+* Enable transparent research project and milestone management
+* Facilitate supervision and reviewer feedback mechanisms
+* Track and manage research funding and grant usage
+* Empower admins with usage monitoring and role management
+
+---
+
+##  Features Overview
+
+| Feature                     | Description                                                                           |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+|  **User Verification**    | Firebase Google Sign-In with three roles: **Researcher**, **Reviewer**, and **Admin** |
+|  **Project Management**   | Researchers can post projects, define team needs, and invite collaborators            |
+|  **Collaboration Tools**  | Real-time messaging, document sharing, and milestone tracking                         |
+|  **Funding Tracker**      | Manage grants, spending logs, and funding forecast dashboards                         |
+|  **Reports & Dashboards** | Export project data as CSV/PDF, with support for custom analytics views               |
+|  **AI Recommendations**   | *(Planned)* Match reviewers to projects based on expertise tags                       |
+
+---
+
+##  Testing & Quality Assurance
+
+* **Unit Testing** using [Jest](https://jestjs.io/)
+* **User Acceptance Testing (UAT)** with the Given-When-Then approach
+* **Code Coverage** tracked with [Codecov](https://codecov.io/)
+* **CI/CD Pipeline** via GitHub Actions for automated testing & deployment
+
+---
+
+##  Technologies Used
+
+* **Frontend**: CRA, (React)
+* **Backend & Services**: Firebase Auth, Firestore, Firebase Storage
+* **Styling**: Bootstrap 5 + Custom CSS
+* **Testing**: Jest, Codecov
+* **CI/CD**: GitHub Actions
+* **Agile Tooling**: Trello for sprint and task tracking
+* **Hosting**: **Microsoft Azure**
+
+---
+
+##  Project Structure
+
+```
+/src
+  /components       # Reusable UI components
+  /pages            # Route-level pages
+  /services         # Firebase/Firestore interactions
+  /utils            # Helper functions
+/tests              # Unit tests
+/.github/workflows  # CI/CD configurations
+README.md
+```
+
+---
+
+##  Team Members
+
+| Name                  | Role          |
+| --------------------- | ------------- |
+| Nonhlanhla Sindane    | Product Owner |
+| Pretty Mangwadi       | Scrum Master  |
+| Smiso Ndlovu          | Developer     |
+| Nkosinathi Tshabalala | Developer     |
+| Khulekani Mtshali     | Developer     |
+| Zainab Lorgat         | Developer     |
+
+---
+
+##  Future Enhancements
+
+* AI-powered collaborator suggestions using tag/expertise matching
+* Reviewer suggestions based on past research contributions
+* Integration with external data sources (e.g., arXiv, ORCID)
+* Funding analytics and prediction models
+* Research project version control and history
+
+---
+
+##  License
+
+This repository is developed for **educational purposes only** as part of the Wits **COMS3003A Software Design** course in 2025.
+
+---

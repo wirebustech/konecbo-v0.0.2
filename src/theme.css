@@ -1,0 +1,37 @@
+/* Konecbo Theme - Dark Green with Orange Accents */
+:root {
+  /* Primary Dark Green Colors */
+  --primary-dark-green: #1B5E20;
+  --primary-green: #2E7D32;
+  --medium-green: #4CAF50;
+  --light-green: #81C784;
+  --lighter-green: #A5D6A7;
+  --lightest-green: #C8E6C9;
+  
+  /* Orange Accent Colors */
+  --orange-primary: #FF6B35;
+  --orange-light: #FF8C42;
+  --orange-lighter: #FFA366;
+  --orange-accent: #FFB88C;
+  
+  /* Neutral Colors */
+  --white: #FFFFFF;
+  --off-white: #F5F5F5;
+  --light-gray: #E0E0E0;
+  --gray: #9E9E9E;
+  --dark-gray: #424242;
+  --text-dark: #1B4332;
+  --text-medium: #2D5016;
+  --text-light: #4A6741;
+  
+  /* Background Colors */
+  --background: #F1F8F4;
+  --card-background: #FFFFFF;
+  --hover-background: rgba(46, 125, 50, 0.1);
+  
+  /* Old colors (for reference during migration) */
+  --old-dark-blue: #132238;
+  --old-light-blue: #64CCC5;
+  --old-accent-teal: #B1EDE8;
+}
+
