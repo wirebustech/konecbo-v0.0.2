@@ -1,105 +1,256 @@
+# Konecbo Research Platform
+
+<div align="center">
+
+![Konecbo Logo](public/konecbo-logo.png)
+
+### Connecting Researchers. Accelerating Trusted Co-Creation.
+
+**Konecbo** is a secure platform for researchers to connect, collaborate, and ensure ideas are protected and contributions recognised.
+
+[Join Waitlist](#) • [Learn More](#features) • [Documentation](#documentation)
 
 ---
 
-# Konecbo – Research Collaboration Platform
+</div>
 
-[![codecov](https://codecov.io/gh/iamprist/University-Research-Collaboration-Platform/branch/skeletoncode/graph/badge.svg?token=EIG69HYXA7)](https://codecov.io/gh/iamprist/University-Research-Collaboration-Platform)
+## 🌟 A New Era of Research Collaboration
 
-**Konecbo** is a global platform designed exclusively for researchers seeking meaningful collaboration. Whether you're launching groundbreaking research or looking to contribute your expertise to innovative projects, Konecbo connects you with the right people at the right time. The platform connects researchers worldwide, facilitates project management, and provides real-time communication and collaboration tools.
+Konecbo is designed to break down silos and help you focus on what matters most: **insights and discovery**.
 
-**How to run Konecbo on your local machine**: npm install (to install all dependencies)
-                                      npm start (to run on localhost)
-                                      To check for coverage, use:
-                                      npx jest--coverage
-
-> Developed for the **COMS3003A Software Design** course at the **University of the Witwatersrand**, 2025.
+In today's research landscape, collaboration is key to breakthrough discoveries. Yet researchers face challenges in finding the right collaborators, protecting their intellectual contributions, and getting recognition for their work. Konecbo solves these challenges by providing a trusted platform where researchers can connect, collaborate, and co-create with confidence.
 
 ---
 
-##  Objectives
+## ✨ Key Features
 
-* Centralize research collaboration in a single platform
-* Enable transparent research project and milestone management
-* Facilitate supervision and reviewer feedback mechanisms
-* Track and manage research funding and grant usage
-* Empower admins with usage monitoring and role management
+### 🤝 Connect with Peers
+Find and connect with early career researchers and professionals who share your interests from around the globe. Our intelligent matching system helps you discover collaborators based on research interests, expertise, and complementary skills.
 
----
+### 💡 Spark New Ideas
+Connect with the right research teams and create discoveries together. Collaborate on projects, share insights, and build on each other's work in a secure, trusted environment.
 
-##  Features Overview
+### 📚 Showcase Your Work
+Share your ongoing research, pre-prints, and published papers to get feedback and citations. Build your research profile and increase the visibility of your contributions to the scientific community.
 
-| Feature                     | Description                                                                           |
-| --------------------------- | ------------------------------------------------------------------------------------- |
-|  **User Verification**    | Firebase Google Sign-In with three roles: **Researcher**, **Reviewer**, and **Admin** |
-|  **Project Management**   | Researchers can post projects, define team needs, and invite collaborators            |
-|  **Collaboration Tools**  | Real-time messaging, document sharing, and milestone tracking                         |
-|  **Funding Tracker**      | Manage grants, spending logs, and funding forecast dashboards                         |
-|  **Reports & Dashboards** | Export project data as CSV/PDF, with support for custom analytics views               |
-|  **AI Recommendations**   | *(Planned)* Match reviewers to projects based on expertise tags                       |
+### 🔒 Protected Collaboration
+Every interaction on Konecbo is tracked and timestamped, ensuring your intellectual contributions are documented and recognised. Our platform provides a secure environment where you can share ideas without fear of losing credit.
 
----
+### 🌍 Global Research Network
+Join a diverse community of researchers from institutions worldwide. Break down geographical barriers and collaborate across borders, disciplines, and time zones.
 
-##  Testing & Quality Assurance
-
-* **Unit Testing** using [Jest](https://jestjs.io/)
-* **User Acceptance Testing (UAT)** with the Given-When-Then approach
-* **Code Coverage** tracked with [Codecov](https://codecov.io/)
-* **CI/CD Pipeline** via GitHub Actions for automated testing & deployment
+### 📊 Track Your Impact
+Monitor citations, collaborations, and the reach of your research. Understand how your work influences the broader research community and identify new opportunities for collaboration.
 
 ---
 
-##  Technologies Used
+## 🚀 Getting Started
 
-* **Frontend**: CRA, (React)
-* **Backend & Services**: Firebase Auth, Firestore, Firebase Storage
-* **Styling**: Bootstrap 5 + Custom CSS
-* **Testing**: Jest, Codecov
-* **CI/CD**: GitHub Actions
-* **Agile Tooling**: Trello for sprint and task tracking
-* **Hosting**: **Microsoft Azure**
+### For Researchers
+
+1. **Sign Up**: Create your researcher profile with your areas of expertise
+2. **Discover**: Browse research projects and connect with potential collaborators
+3. **Collaborate**: Join projects, share insights, and co-create discoveries
+4. **Showcase**: Publish your work and track its impact
+
+### For Research Teams
+
+1. **Create Projects**: Post your research needs and find the right collaborators
+2. **Manage Collaborations**: Track contributions and ensure fair recognition
+3. **Secure Funding**: Connect with funding opportunities aligned with your research
+4. **Build Your Network**: Grow your research team with talented early-career researchers
 
 ---
 
-##  Project Structure
+## 💻 Technology Stack
 
+Konecbo is built with modern, scalable technologies to ensure a seamless research collaboration experience:
+
+### Frontend
+- **React** - Dynamic, responsive user interface
+- **Material-UI** - Modern, accessible design components
+- **Firebase** - Real-time collaboration features
+- **React Router** - Seamless navigation
+
+### Backend
+- **Node.js & Express** - Robust API server
+- **PostgreSQL** - Secure, reliable data storage
+- **JWT Authentication** - Industry-standard security
+- **RESTful API** - Clean, scalable architecture
+
+### Security & Compliance
+- **End-to-end encryption** for sensitive communications
+- **Role-based access control** for data protection
+- **GDPR compliant** data handling
+- **Audit trails** for intellectual property protection
+
+---
+
+## 🎯 Use Cases
+
+### Early Career Researchers
+- Build your research network from day one
+- Find mentors and collaborators in your field
+- Showcase your work to increase visibility
+- Get feedback on pre-prints and ongoing research
+
+### Research Teams
+- Find specialized expertise for complex projects
+- Manage multi-institutional collaborations
+- Track contributions for fair authorship attribution
+- Secure funding through platform partnerships
+
+### Institutions
+- Facilitate cross-departmental collaboration
+- Track research output and impact
+- Connect students with industry partners
+- Enhance institutional research visibility
+
+---
+
+## 🌐 Platform Highlights
+
+### Intelligent Matching
+Our AI-powered matching system connects you with researchers whose expertise complements yours, increasing the likelihood of successful collaborations.
+
+### Secure Messaging
+Communicate with collaborators through our encrypted messaging system, ensuring your ideas remain confidential until you're ready to share them publicly.
+
+### Project Management
+Manage research projects with built-in tools for task assignment, milestone tracking, and progress monitoring.
+
+### Citation Tracking
+Automatically track citations of your work across the platform and beyond, helping you understand your research impact.
+
+### Funding Opportunities
+Discover funding opportunities matched to your research interests and collaborate on grant applications.
+
+### Peer Review
+Get constructive feedback from peers before publication, improving the quality of your research output.
+
+---
+
+## 📖 Documentation
+
+### Quick Links
+- [User Guide](docs/USER_GUIDE.md) - Complete guide for researchers
+- [API Documentation](docs/API.md) - For developers and integrations
+- [Security & Privacy](docs/SECURITY.md) - How we protect your data
+- [Terms & Conditions](src/pages/TermsAndConditions.jsx) - Platform terms
+- [Privacy Policy](src/pages/PrivacyPolicy.jsx) - Data protection policy
+
+### Developer Documentation
+- [Deployment Guide](DEPLOYMENT_GUIDE.md) - Deploy to production
+- [Architecture Overview](ARCHITECTURE.md) - System design
+- [Authentication System](AUTH_README.md) - Auth implementation
+- [Admin Dashboard](ADMIN_DASHBOARD_UPDATE.md) - Admin features
+
+---
+
+## 🛠️ Installation & Setup
+
+### Prerequisites
+- Node.js 18+ and npm
+- PostgreSQL 14+
+- Git
+
+### Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/wirebustech/konecbo-v0.0.2.git
+cd konecbo-v0.0.2
+
+# Install frontend dependencies
+npm install
+
+# Install backend dependencies
+cd server
+npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# Initialize database
+npm run init-db
+
+# Start backend server
+npm run dev
+
+# In a new terminal, start frontend
+cd ..
+npm start
 ```
-/src
-  /components       # Reusable UI components
-  /pages            # Route-level pages
-  /services         # Firebase/Firestore interactions
-  /utils            # Helper functions
-/tests              # Unit tests
-/.github/workflows  # CI/CD configurations
-README.md
-```
+
+The application will be available at `http://localhost:3000`
 
 ---
 
-##  Team Members
+## 🔐 Security & Privacy
 
-| Name                  | Role          |
-| --------------------- | ------------- |
-| Nonhlanhla Sindane    | Product Owner |
-| Pretty Mangwadi       | Scrum Master  |
-| Smiso Ndlovu          | Developer     |
-| Nkosinathi Tshabalala | Developer     |
-| Khulekani Mtshali     | Developer     |
-| Zainab Lorgat         | Developer     |
+At Konecbo, we take security and privacy seriously:
 
----
-
-##  Future Enhancements
-
-* AI-powered collaborator suggestions using tag/expertise matching
-* Reviewer suggestions based on past research contributions
-* Integration with external data sources (e.g., arXiv, ORCID)
-* Funding analytics and prediction models
-* Research project version control and history
+- **Data Encryption**: All data is encrypted in transit and at rest
+- **Access Control**: Role-based permissions ensure data privacy
+- **Audit Trails**: Complete logging of all platform activities
+- **GDPR Compliance**: Full compliance with data protection regulations
+- **Intellectual Property Protection**: Timestamped records of all contributions
+- **Secure Authentication**: Multi-factor authentication available
 
 ---
 
-##  License
+## 🤝 Contributing
 
-This repository is developed for **educational purposes only** as part of the Wits **COMS3003A Software Design** course in 2025.
+We welcome contributions from the research and developer community! Here's how you can help:
+
+1. **Report Bugs**: Submit issues on our GitHub repository
+2. **Suggest Features**: Share your ideas for platform improvements
+3. **Code Contributions**: Submit pull requests for bug fixes or features
+4. **Documentation**: Help improve our documentation
+5. **Spread the Word**: Share Konecbo with your research network
 
 ---
+
+## 📬 Contact & Support
+
+### Get in Touch
+- **Email**: support@konecbo.com
+- **Website**: www.konecbo.com
+- **Twitter**: @konecbo
+- **LinkedIn**: Konecbo Research Platform
+
+### Support
+- **Help Center**: help.konecbo.com
+- **Community Forum**: community.konecbo.com
+- **Status Page**: status.konecbo.com
+
+---
+
+## 📜 License
+
+Copyright © 2025 Konecbo. All rights reserved.
+
+This platform is proprietary software. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.
+
+For licensing inquiries, please contact: licensing@konecbo.com
+
+---
+
+## 🌟 Join the Research Revolution
+
+Ready to transform how you collaborate on research?
+
+**[Join Our Waitlist](#)** to be the first to know when we launch.
+
+Together, we're building the future of research collaboration.
+
+---
+
+<div align="center">
+
+**Konecbo** - Connecting Researchers, Accelerating Discovery
+
+Made with ❤️ for the global research community
+
+</div>
