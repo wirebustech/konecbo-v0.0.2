@@ -229,7 +229,7 @@ We welcome contributions from the research and developer community! Here's how y
 
 ## 📜 License
 
-Copyright © 2025 Konecbo. All rights reserved.
+Copyright © 2026 Konecbo. All rights reserved.
 
 This platform is proprietary software. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.
 
@@ -241,7 +241,7 @@ For licensing inquiries, please contact: licensing@konecbo.com
 
 Ready to transform how you collaborate on research?
 
-**[Join Our Waitlist](#)** to be the first to know when we launch.
+**[Join Our Konecbo](https://konecbo.com)** ......
 
 Together, we're building the future of research collaboration.
 
