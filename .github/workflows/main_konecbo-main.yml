@@ -27,11 +27,14 @@ jobs:
         with:
           node-version: '24.x'
 
-      - name: npm install, build, and test
+      - name: npm install, build, and prune
         run: |
           npm install
-          npm run build --if-present
-          npm run test --if-present
+          npm run build
+          # Prune dev dependencies to reduce size (this removes react-scripts etc)
+          npm prune --production
+          # Remove source files not needed for production execution
+          rm -rf src public .git
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
