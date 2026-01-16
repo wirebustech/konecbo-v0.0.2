@@ -27,14 +27,11 @@ jobs:
         with:
           node-version: '24.x'
 
-      - name: npm install, build, and prune
+      - name: npm install, build, and test
         run: |
           npm install
-          npm run build
-          # Prune dev dependencies to reduce size (this removes react-scripts etc)
-          npm prune --production
-          # Remove source files not needed for production execution
-          rm -rf src public .git
+          npm run build --if-present
+          npm run test --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -69,4 +66,5 @@ jobs:
           app-name: 'konecbo-main'
           slot-name: 'Production'
           package: .
+          startup-command: 'node server.js'
           
