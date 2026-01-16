@@ -1,4 +1,4 @@
-/* global globalThis */
+
 // researcherEditProfileLogic.js
 // Backend logic for EditProfile (data fetching, updating, and auth)
 

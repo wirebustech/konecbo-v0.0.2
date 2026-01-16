@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Box, Typography, Chip } from "@mui/material";
+import { Box } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import LoginIcon from "@mui/icons-material/Login";
@@ -11,7 +11,7 @@ import SchoolIcon from "@mui/icons-material/School";
 
 const Navigation = ({ variant = "horizontal" }) => {
   const location = useLocation();
-  
+
   const navLinks = [
     { text: "Home", icon: <HomeIcon />, path: "/" },
     { text: "About", icon: <InfoIcon />, path: "/about" },
@@ -85,17 +85,17 @@ const Navigation = ({ variant = "horizontal" }) => {
             gap: "0.5rem",
             padding: "0.5rem 1rem",
             borderRadius: "8px",
-            backgroundColor: location.pathname === link.path 
-              ? "var(--primary-green)" 
+            backgroundColor: location.pathname === link.path
+              ? "var(--primary-green)"
               : "transparent",
-            color: location.pathname === link.path 
-              ? "var(--white)" 
+            color: location.pathname === link.path
+              ? "var(--white)"
               : "var(--text-dark)",
             fontWeight: location.pathname === link.path ? 600 : 500,
             fontSize: "0.9rem",
             transition: "all 0.3s ease",
-            border: location.pathname === link.path 
-              ? "1px solid var(--primary-green)" 
+            border: location.pathname === link.path
+              ? "1px solid var(--primary-green)"
               : "1px solid transparent",
           }}
           onMouseEnter={(e) => {

@@ -23,8 +23,6 @@ import {
     Divider,
     MenuItem,
     Container,
-    useTheme,
-    useMediaQuery,
     Checkbox,
     FormControlLabel
 } from "@mui/material";
@@ -43,8 +41,7 @@ const REGIONS = [
 
 function SignUpPageSimple() {
     const navigate = useNavigate();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 
     const [formData, setFormData] = useState({
         fullName: "",
