@@ -1,5 +1,14 @@
 # Azure Environment Variables - Exact Input Format
 
+## 🔴 CRITICAL: "Basic Authentication is disabled" Error
+If you cannot download the publish profile, you must enable Basic Auth:
+1. Go to **Azure Portal** → **Your Web App** → **Configuration** → **General settings**.
+2. Set **SCM Basic Auth Publishing Credentials** to **On**.
+3. Click **Save**.
+
+---
+
+
 ## 📝 How to Input in Azure Portal
 
 Go to: **Azure Portal → Your Web App → Configuration → Application settings → + New application setting**
