@@ -42,6 +42,9 @@ jobs:
           cp package-lock.json deployment_artifact/
           cp web.config deployment_artifact/
           
+          # SAFETY: Remove any Zone.Identifier files that might have snuck into the build
+          find deployment_artifact -name "*:Zone.Identifier" -type f -delete
+          
           # We purposefully DO NOT copy node_modules. 
           # Azure will install production dependencies based on package.json
 
