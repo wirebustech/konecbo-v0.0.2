@@ -4,12 +4,28 @@ const app = express();
 require('dotenv').config();
 
 // Try to load database config, but don't crash if it fails (for batch 1 readiness)
-let pool;
-try {
-    pool = require('./server/config/database');
-} catch (e) {
-    console.warn('Database config could not be loaded:', e);
-}
+const { Pool } = require('pg');
+
+// Initialize Database Pool directly here to avoid path resolution issues in Azure artifact
+const pool = new Pool({
+    host: process.env.DB_HOST || 'konecbo-db.postgres.database.azure.com',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'konecbo',
+    user: process.env.DB_USER || 'konecboadmin',
+    password: process.env.DB_PASSWORD,
+    ssl: { rejectUnauthorized: false }, // Critical for Azure
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+});
+
+pool.on('connect', () => {
+    console.log('✅ Connected to PostgreSQL database');
+});
+
+pool.on('error', (err) => {
+    console.error('❌ Unexpected error on idle client', err);
+});
 
 // Serve static files from the build directory
 app.use(express.static(path.join(__dirname, 'build')));
@@ -25,14 +41,13 @@ app.get('/verify-deployment', (req, res) => {
     res.send(`Deployment Active. Timestamp: ${new Date().toISOString()}`);
 });
 
-// Health Check Endpoint (Batch 1 verification)
+// Health Check Endpoint
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Konecbo Server is running' });
 });
 
-// DB Connection Test Endpoint (Batch 1 verification)
+// DB Connection Test Endpoint
 app.get('/api/db-test', async (req, res) => {
-    if (!pool) return res.status(500).json({ error: 'Database pool not initialized' });
     try {
         const result = await pool.query('SELECT NOW()');
         res.json({ status: 'connected', time: result.rows[0].now });
@@ -43,7 +58,8 @@ app.get('/api/db-test', async (req, res) => {
 });
 
 // Handle React routing, return all requests to React app
-app.get('*', (req, res) => {
+// Using Regex /.*/ because string '*' is invalid in newer path-to-regexp used by Express 5
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
