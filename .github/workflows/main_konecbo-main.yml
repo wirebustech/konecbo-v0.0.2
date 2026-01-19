@@ -45,8 +45,12 @@ jobs:
           # SAFETY: Remove any Zone.Identifier files that might have snuck into the build
           find deployment_artifact -name "*:Zone.Identifier" -type f -delete
           
-          # We purposefully DO NOT copy node_modules. 
-          # Azure will install production dependencies based on package.json
+          # CRITICAL FIX: Install production dependencies directly into the artifact.
+          # We cannot rely on Azure to run 'npm install' automatically in all scenarios.
+          # This ensures 'express' and 'pg' are present when the server starts.
+          cd deployment_artifact
+          npm ci --production
+          cd ..
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
