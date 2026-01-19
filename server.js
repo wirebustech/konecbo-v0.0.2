@@ -14,6 +14,17 @@ try {
 // Serve static files from the build directory
 app.use(express.static(path.join(__dirname, 'build')));
 
+// Debug Middleware: Log all requests
+app.use((req, res, next) => {
+    console.log(`[Request] ${req.method} ${req.url}`);
+    next();
+});
+
+// Deployment Verification Route
+app.get('/verify-deployment', (req, res) => {
+    res.send(`Deployment Active. Timestamp: ${new Date().toISOString()}`);
+});
+
 // Health Check Endpoint (Batch 1 verification)
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Konecbo Server is running' });

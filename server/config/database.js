@@ -1,25 +1,29 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Azure Database uses SSL by default. We must enable it.
 const pool = new Pool({
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || 'konecbo-db.postgres.database.azure.com',
     port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'konecbo-main-database',
-    user: process.env.DB_USER || 'zxeswklxuz',
-    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME || 'konecbo',
+    user: process.env.DB_USER || 'konecboadmin',
+    password: process.env.DB_PASSWORD, // Must be supplied via Environment Variables
+    ssl: {
+        rejectUnauthorized: false // Required for Azure PostgreSQL connectivity
+    },
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 5000,
 });
 
-// Test database connection
+// Test database connection listener
 pool.on('connect', () => {
     console.log('✅ Connected to PostgreSQL database');
 });
 
 pool.on('error', (err) => {
     console.error('❌ Unexpected error on idle client', err);
-    process.exit(-1);
+    // Don't crash the entire app on DB idle error, just log it
 });
 
 module.exports = pool;
