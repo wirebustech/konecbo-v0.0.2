@@ -13,6 +13,7 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import "../pages/Researcher/ResearcherDashboard.css";
 import axios from "axios";
+import authService from "../services/authService";
 import { Typography, Box, Button as MuiButton, Paper, TextField, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, FormGroup, Stepper, Step, StepLabel, RadioGroup, Radio, FormLabel, InputAdornment, IconButton, Chip, LinearProgress } from "@mui/material";
 
 const SignUpPage = () => {
@@ -30,8 +31,10 @@ const SignUpPage = () => {
     password: "",
     confirmPassword: "",
     fullName: "",
+    phoneNumber: "",
+    region: "",
     agreeToTerms: false,
-    
+
     // Step 2: Research Profile
     currentPosition: "",
     institution: "",
@@ -42,7 +45,7 @@ const SignUpPage = () => {
     subDiscipline: "",
     researchInterests: "",
     languages: "",
-    
+
     // Step 3: Academic Background
     highestDegree: "",
     degreeField: "",
@@ -50,7 +53,7 @@ const SignUpPage = () => {
     graduationYear: "",
     orcidId: "",
     institutionalEmail: "",
-    
+
     // Step 4: Research Experience
     yearsOfExperience: "",
     numberOfPublications: "",
@@ -58,7 +61,7 @@ const SignUpPage = () => {
     pastProjects: "",
     skills: "",
     methodologies: "",
-    
+
     // Step 5: Collaboration Preferences
     lookingToPost: false,
     lookingToJoin: false,
@@ -66,7 +69,7 @@ const SignUpPage = () => {
     timeAvailability: "",
     availabilityHours: "",
     careerGoals: "",
-    
+
     // Step 6: Additional Information
     bio: "",
     website: "",
@@ -122,11 +125,11 @@ const SignUpPage = () => {
 
   const validateStep = (step) => {
     const isGoogleUser = auth.currentUser && !formData.password;
-    
+
     switch (step) {
       case 0:
-        if (!formData.email || !formData.fullName) {
-          toast.error("Please fill in all required fields");
+        if (!formData.email || !formData.fullName || !formData.phoneNumber || !formData.region) {
+          toast.error("Please fill in all required fields (Name, Email, Phone, Region)");
           return false;
         }
         if (!isGoogleUser) {
@@ -177,7 +180,7 @@ const SignUpPage = () => {
 
       // Check if user already exists
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      
+
       if (userDoc.exists()) {
         // User already exists, just sign them in
         const token = await user.getIdToken();
@@ -204,7 +207,7 @@ const SignUpPage = () => {
         email: user.email,
         role: "researcher",
         kycCompleted: false,
-        createdAt: serverTimestamp(),
+        // createdAt: serverTimestamp(), // Handled by backend
         provider: "google",
       });
 
@@ -229,39 +232,22 @@ const SignUpPage = () => {
 
     setLoading(true);
     try {
-      let user;
-      let isGoogleUser = false;
+      // 1. Register User via Node.js Backend
+      await authService.register(
+        formData.email,
+        formData.password,
+        formData.fullName,
+        formData.phoneNumber,
+        formData.region
+      );
 
-      // Check if user is already authenticated (Google sign-up)
-      if (auth.currentUser) {
-        user = auth.currentUser;
-        isGoogleUser = true;
-      } else {
-        // Create new user account with email/password
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-        );
-        user = userCredential.user;
-
-        // Update display name
-        await updateProfile(user, {
-          displayName: formData.fullName
-        });
-      }
-
-      // Get auth token
-      const token = await user.getIdToken();
-      localStorage.setItem("authToken", token);
-
-      // Prepare KYC data
+      // 2. Prepare KYC Data
       const kycData = {
         // Basic Info
         email: formData.email,
         name: formData.fullName,
-        createdAt: serverTimestamp(),
-        
+        // createdAt: serverTimestamp(), // Handled by backend
+
         // Research Profile
         currentPosition: formData.currentPosition,
         institution: formData.institution === 'Other' ? formData.customInstitution : formData.institution,
@@ -270,7 +256,7 @@ const SignUpPage = () => {
         subDiscipline: formData.subDiscipline,
         researchInterests: formData.researchInterests.split(',').map(s => s.trim()).filter(s => s),
         languages: formData.languages.split(',').map(s => s.trim()).filter(s => s),
-        
+
         // Academic Background
         highestDegree: formData.highestDegree,
         degreeField: formData.degreeField,
@@ -278,7 +264,7 @@ const SignUpPage = () => {
         graduationYear: formData.graduationYear,
         orcidId: formData.orcidId,
         institutionalEmail: formData.institutionalEmail,
-        
+
         // Research Experience
         yearsOfExperience: parseInt(formData.yearsOfExperience) || 0,
         numberOfPublications: parseInt(formData.numberOfPublications) || 0,
@@ -286,7 +272,7 @@ const SignUpPage = () => {
         pastProjects: formData.pastProjects,
         skills: formData.skills.split(',').map(s => s.trim()).filter(s => s),
         methodologies: formData.methodologies.split(',').map(s => s.trim()).filter(s => s),
-        
+
         // Collaboration Preferences
         lookingToPost: formData.lookingToPost,
         lookingToJoin: formData.lookingToJoin,
@@ -294,55 +280,26 @@ const SignUpPage = () => {
         timeAvailability: formData.timeAvailability,
         availabilityHours: formData.availabilityHours,
         careerGoals: formData.careerGoals,
-        
+
         // Additional Information
         bio: formData.bio,
         website: formData.website,
         linkedin: formData.linkedin,
         twitter: formData.twitter,
         researchStatement: formData.researchStatement,
-        
+
         // Metadata
         kycCompleted: true,
-        kycCompletedAt: serverTimestamp(),
+        // kycCompletedAt: serverTimestamp(), // Handled by backend
         ipAddress: ipAddress,
         profileCompleteness: calculateProfileCompleteness(),
       };
 
-      // Save to Firestore - update existing or create new
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (userDoc.exists()) {
-        // Update existing user (Google sign-up case)
-        await setDoc(userDocRef, {
-          name: formData.fullName,
-          email: formData.email,
-          role: "researcher",
-          kycData: kycData,
-          kycCompleted: true,
-          kycCompletedAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        }, { merge: true });
-      } else {
-        // Create new user
-        await setDoc(userDocRef, {
-          name: formData.fullName,
-          email: formData.email,
-          role: "researcher",
-          kycData: kycData,
-          kycCompleted: true,
-          kycCompletedAt: serverTimestamp(),
-          createdAt: serverTimestamp(),
-          provider: isGoogleUser ? "google" : "email",
-        });
-      }
-
-      // Also save detailed profile (create or update)
-      await setDoc(doc(db, "user-profiles", user.uid), kycData, { merge: true });
+      // 3. Update Profile via Node.js Backend
+      await authService.updateProfile(kycData);
 
       toast.success("Account created successfully! Welcome to Konecbo!");
-      
+
       // Navigate to appropriate dashboard
       navigate("/researcher-dashboard");
     } catch (error) {
@@ -412,7 +369,7 @@ const SignUpPage = () => {
 
   const renderStepContent = () => {
     const isGoogleUser = auth.currentUser && !formData.password;
-    
+
     switch (activeStep) {
       case 0:
         return (
@@ -460,6 +417,24 @@ const SignUpPage = () => {
                   color: "#64CCC5",
                 },
               }}
+            />
+            <TextField
+              label="Phone Number"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleInputChange}
+              required
+              fullWidth
+              sx={modernTextFieldStyle}
+            />
+            <TextField
+              label="Region"
+              name="region"
+              value={formData.region}
+              onChange={handleInputChange}
+              required
+              fullWidth
+              sx={modernTextFieldStyle}
             />
             {!isGoogleUser && (
               <>
@@ -566,7 +541,7 @@ const SignUpPage = () => {
             />
           </Box>
         );
-      
+
       case 1:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -591,7 +566,7 @@ const SignUpPage = () => {
                 <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
-            
+
             <TextField
               label="Institution/Organization"
               name="institution"
@@ -600,7 +575,7 @@ const SignUpPage = () => {
               fullWidth
               sx={modernTextFieldStyle}
             />
-            
+
             <FormControl fullWidth>
               <InputLabel sx={{ '&.Mui-focused': { color: "#FF6B35" } }}>Country</InputLabel>
               <Select
@@ -620,7 +595,7 @@ const SignUpPage = () => {
                 <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
-            
+
             {formData.country === 'Other' && (
               <TextField
                 label="Specify Country"
@@ -631,7 +606,7 @@ const SignUpPage = () => {
                 sx={modernTextFieldStyle}
               />
             )}
-            
+
             <FormControl fullWidth required>
               <InputLabel sx={{ '&.Mui-focused': { color: "#FF6B35" } }}>Primary Research Discipline</InputLabel>
               <Select
@@ -651,7 +626,7 @@ const SignUpPage = () => {
                 <MenuItem value="Interdisciplinary">Interdisciplinary</MenuItem>
               </Select>
             </FormControl>
-            
+
             <TextField
               label="Sub-Discipline"
               name="subDiscipline"
@@ -661,7 +636,7 @@ const SignUpPage = () => {
               helperText="Specific area within your field"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Research Interests"
               name="researchInterests"
@@ -673,7 +648,7 @@ const SignUpPage = () => {
               helperText="Enter 3-5 keywords separated by commas"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Languages Spoken"
               name="languages"
@@ -685,7 +660,7 @@ const SignUpPage = () => {
             />
           </Box>
         );
-      
+
       case 2:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -705,7 +680,7 @@ const SignUpPage = () => {
                 <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
-            
+
             <TextField
               label="Degree Field"
               name="degreeField"
@@ -714,7 +689,7 @@ const SignUpPage = () => {
               fullWidth
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Institution Name"
               name="institutionName"
@@ -723,7 +698,7 @@ const SignUpPage = () => {
               fullWidth
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Graduation Year"
               name="graduationYear"
@@ -734,7 +709,7 @@ const SignUpPage = () => {
               inputProps={{ min: 1950, max: new Date().getFullYear() }}
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="ORCID ID (Optional)"
               name="orcidId"
@@ -744,7 +719,7 @@ const SignUpPage = () => {
               helperText="For credential validation (e.g., 0000-0000-0000-0000)"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Institutional Email (Optional)"
               name="institutionalEmail"
@@ -773,7 +748,7 @@ const SignUpPage = () => {
             />
           </Box>
         );
-      
+
       case 3:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -787,7 +762,7 @@ const SignUpPage = () => {
               inputProps={{ min: 0 }}
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Number of Publications"
               name="numberOfPublications"
@@ -798,7 +773,7 @@ const SignUpPage = () => {
               inputProps={{ min: 0 }}
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Publications (Optional)"
               name="publications"
@@ -810,7 +785,7 @@ const SignUpPage = () => {
               helperText="List key publications, one per line (DOIs or URLs preferred)"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Past Research Projects"
               name="pastProjects"
@@ -822,7 +797,7 @@ const SignUpPage = () => {
               helperText="Brief description of your past research projects"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Skills & Expertise"
               name="skills"
@@ -834,7 +809,7 @@ const SignUpPage = () => {
               helperText="Comma-separated list (e.g., Python, Statistical Analysis, Lab Techniques)"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Research Methodologies"
               name="methodologies"
@@ -848,7 +823,7 @@ const SignUpPage = () => {
             />
           </Box>
         );
-      
+
       case 4:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -884,7 +859,7 @@ const SignUpPage = () => {
                 label={<Typography sx={{ color: "#1B5E20", fontSize: "0.95rem" }}>I'm looking to join research projects as a collaborator</Typography>}
               />
             </FormGroup>
-            
+
             <FormControl component="fieldset" sx={{ mt: 2 }}>
               <FormLabel component="legend" sx={{ color: "#1B5E20", fontWeight: 600, mb: 1 }}>Preferred Collaboration Types</FormLabel>
               <FormGroup>
@@ -908,7 +883,7 @@ const SignUpPage = () => {
                 ))}
               </FormGroup>
             </FormControl>
-            
+
             <FormControl fullWidth>
               <InputLabel sx={{ '&.Mui-focused': { color: "#FF6B35" } }}>Time Availability</InputLabel>
               <Select
@@ -925,7 +900,7 @@ const SignUpPage = () => {
                 <MenuItem value="Variable/Flexible">Variable/Flexible</MenuItem>
               </Select>
             </FormControl>
-            
+
             <TextField
               label="Career Goals & Learning Objectives"
               name="careerGoals"
@@ -939,7 +914,7 @@ const SignUpPage = () => {
             />
           </Box>
         );
-      
+
       case 5:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -954,7 +929,7 @@ const SignUpPage = () => {
               helperText="Brief professional biography"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Personal Website (Optional)"
               name="website"
@@ -964,7 +939,7 @@ const SignUpPage = () => {
               type="url"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="LinkedIn Profile (Optional)"
               name="linkedin"
@@ -974,7 +949,7 @@ const SignUpPage = () => {
               type="url"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Twitter/X Handle (Optional)"
               name="twitter"
@@ -984,7 +959,7 @@ const SignUpPage = () => {
               helperText="e.g., @username"
               sx={modernTextFieldStyle}
             />
-            
+
             <TextField
               label="Research Statement (Optional)"
               name="researchStatement"
@@ -998,7 +973,7 @@ const SignUpPage = () => {
             />
           </Box>
         );
-      
+
       default:
         return null;
     }
@@ -1007,8 +982,8 @@ const SignUpPage = () => {
   const progressPercentage = ((activeStep + 1) / steps.length) * 100;
 
   return (
-    <main 
-      role="main" 
+    <main
+      role="main"
       style={{
         minHeight: "100vh",
         background: "linear-gradient(135deg, #1B5E20 0%, #2E7D32 25%, #4CAF50 50%, #66BB6A 75%, #81C784 100%)",
@@ -1133,185 +1108,185 @@ const SignUpPage = () => {
             animation: "fadeInUp 0.6s ease forwards",
           }}
         >
-        <Box sx={{ mb: 4, textAlign: "center" }}>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 700,
-              fontSize: { xs: "1.75rem", sm: "2rem" },
-              color: "#1B5E20",
-              mb: 1,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Create Your Account
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: "#424242",
-              fontSize: "0.95rem",
-            }}
-          >
-            Join thousands of researchers worldwide
-          </Typography>
-        </Box>
-
-        <Stepper 
-          activeStep={activeStep} 
-          alternativeLabel 
-          sx={{ 
-            mb: 4,
-            '& .MuiStepLabel-root .Mui-completed': {
-              color: '#FF6B35',
-            },
-            '& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel': {
-              color: '#FF6B35',
-            },
-            '& .MuiStepLabel-root .Mui-active': {
-              color: '#1B5E20',
-            },
-            '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel': {
-              color: '#1B5E20',
-              fontWeight: 600,
-            },
-          }}
-        >
-          {steps.map((label, index) => (
-            <Step key={label} completed={index < activeStep}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-
-        <form onSubmit={activeStep === steps.length - 1 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }}>
-          <Box sx={{ mb: 4, minHeight: "400px" }}>
-            {renderStepContent()}
+          <Box sx={{ mb: 4, textAlign: "center" }}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: "1.75rem", sm: "2rem" },
+                color: "#1B5E20",
+                mb: 1,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Create Your Account
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: "#424242",
+                fontSize: "0.95rem",
+              }}
+            >
+              Join thousands of researchers worldwide
+            </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, gap: 2 }}>
+          <Stepper
+            activeStep={activeStep}
+            alternativeLabel
+            sx={{
+              mb: 4,
+              '& .MuiStepLabel-root .Mui-completed': {
+                color: '#FF6B35',
+              },
+              '& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel': {
+                color: '#FF6B35',
+              },
+              '& .MuiStepLabel-root .Mui-active': {
+                color: '#1B5E20',
+              },
+              '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel': {
+                color: '#1B5E20',
+                fontWeight: 600,
+              },
+            }}
+          >
+            {steps.map((label, index) => (
+              <Step key={label} completed={index < activeStep}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+
+          <form onSubmit={activeStep === steps.length - 1 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }}>
+            <Box sx={{ mb: 4, minHeight: "400px" }}>
+              {renderStepContent()}
+            </Box>
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, gap: 2 }}>
+              <MuiButton
+                disabled={activeStep === 0 || loading}
+                onClick={handleBack}
+                sx={{
+                  color: "#424242",
+                  textTransform: "none",
+                  fontWeight: 500,
+                  minWidth: "100px",
+                  '&:hover': {
+                    backgroundColor: "rgba(46, 125, 50, 0.1)",
+                  },
+                  '&:disabled': {
+                    color: "#9E9E9E",
+                  },
+                }}
+              >
+                Back
+              </MuiButton>
+              {activeStep === steps.length - 1 ? (
+                <MuiButton
+                  type="submit"
+                  variant="contained"
+                  disabled={loading}
+                  sx={{
+                    backgroundColor: "#1B5E20",
+                    color: "#FFFFFF",
+                    padding: "0.875rem 2rem",
+                    borderRadius: "12px",
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    boxShadow: "0 4px 12px rgba(27, 94, 32, 0.3)",
+                    transition: "all 0.3s ease",
+                    '&:hover': {
+                      backgroundColor: "#2E7D32",
+                      boxShadow: "0 6px 20px rgba(27, 94, 32, 0.4)",
+                      transform: "translateY(-1px)",
+                    },
+                    '&:active': {
+                      transform: "translateY(0)",
+                    },
+                    '&:disabled': {
+                      backgroundColor: "#9E9E9E",
+                    },
+                  }}
+                >
+                  {loading ? "Creating Account..." : "Create Account"}
+                </MuiButton>
+              ) : (
+                <MuiButton
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#1B5E20",
+                    color: "#FFFFFF",
+                    padding: "0.875rem 2rem",
+                    borderRadius: "12px",
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    boxShadow: "0 4px 12px rgba(27, 94, 32, 0.3)",
+                    transition: "all 0.3s ease",
+                    '&:hover': {
+                      backgroundColor: "#2E7D32",
+                      boxShadow: "0 6px 20px rgba(27, 94, 32, 0.4)",
+                      transform: "translateY(-1px)",
+                    },
+                    '&:active': {
+                      transform: "translateY(0)",
+                    },
+                  }}
+                >
+                  Next
+                </MuiButton>
+              )}
+            </Box>
+          </form>
+
+          <Box sx={{ mt: 4, textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ mb: 2, color: "#424242" }}>
+              Or sign up with
+            </Typography>
             <MuiButton
-              disabled={activeStep === 0 || loading}
-              onClick={handleBack}
-              sx={{ 
-                color: "#424242",
-                textTransform: "none",
+              onClick={handleGoogleSignUp}
+              disabled={loading}
+              variant="outlined"
+              fullWidth
+              sx={{
+                borderColor: "#E0E0E0",
+                color: "#1B5E20",
+                padding: "0.875rem 1.5rem",
+                borderRadius: "12px",
+                fontSize: "1rem",
                 fontWeight: 500,
-                minWidth: "100px",
+                textTransform: "none",
+                backgroundColor: "#FFFFFF",
+                transition: "all 0.3s ease",
                 '&:hover': {
-                  backgroundColor: "rgba(46, 125, 50, 0.1)",
+                  borderColor: "#81C784",
+                  backgroundColor: "#F1F8F4",
+                  boxShadow: "0 2px 8px rgba(46, 125, 50, 0.15)",
                 },
                 '&:disabled': {
+                  borderColor: "#E0E0E0",
                   color: "#9E9E9E",
                 },
               }}
             >
-              Back
+              <img
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt=""
+                style={{ height: "20px", width: "20px", marginRight: "12px" }}
+              />
+              Continue with Google
             </MuiButton>
-            {activeStep === steps.length - 1 ? (
-              <MuiButton
-                type="submit"
-                variant="contained"
-                disabled={loading}
-                sx={{
-                  backgroundColor: "#1B5E20",
-                  color: "#FFFFFF",
-                  padding: "0.875rem 2rem",
-                  borderRadius: "12px",
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  boxShadow: "0 4px 12px rgba(27, 94, 32, 0.3)",
-                  transition: "all 0.3s ease",
-                  '&:hover': {
-                    backgroundColor: "#2E7D32",
-                    boxShadow: "0 6px 20px rgba(27, 94, 32, 0.4)",
-                    transform: "translateY(-1px)",
-                  },
-                  '&:active': {
-                    transform: "translateY(0)",
-                  },
-                  '&:disabled': {
-                    backgroundColor: "#9E9E9E",
-                  },
-                }}
-              >
-                {loading ? "Creating Account..." : "Create Account"}
-              </MuiButton>
-            ) : (
-              <MuiButton
-                type="submit"
-                variant="contained"
-                sx={{
-                  backgroundColor: "#1B5E20",
-                  color: "#FFFFFF",
-                  padding: "0.875rem 2rem",
-                  borderRadius: "12px",
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  textTransform: "none",
-                  boxShadow: "0 4px 12px rgba(27, 94, 32, 0.3)",
-                  transition: "all 0.3s ease",
-                  '&:hover': {
-                    backgroundColor: "#2E7D32",
-                    boxShadow: "0 6px 20px rgba(27, 94, 32, 0.4)",
-                    transform: "translateY(-1px)",
-                  },
-                  '&:active': {
-                    transform: "translateY(0)",
-                  },
-                }}
-              >
-                Next
-              </MuiButton>
-            )}
           </Box>
-        </form>
 
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Typography variant="body2" sx={{ mb: 2, color: "#424242" }}>
-            Or sign up with
-          </Typography>
-          <MuiButton
-            onClick={handleGoogleSignUp}
-            disabled={loading}
-            variant="outlined"
-            fullWidth
-            sx={{
-              borderColor: "#E0E0E0",
-              color: "#1B5E20",
-              padding: "0.875rem 1.5rem",
-              borderRadius: "12px",
-              fontSize: "1rem",
-              fontWeight: 500,
-              textTransform: "none",
-              backgroundColor: "#FFFFFF",
-              transition: "all 0.3s ease",
-              '&:hover': {
-                borderColor: "#81C784",
-                backgroundColor: "#F1F8F4",
-                boxShadow: "0 2px 8px rgba(46, 125, 50, 0.15)",
-              },
-              '&:disabled': {
-                borderColor: "#E0E0E0",
-                color: "#9E9E9E",
-              },
-            }}
-          >
-            <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              alt=""
-              style={{ height: "20px", width: "20px", marginRight: "12px" }}
-            />
-            Continue with Google
-          </MuiButton>
-        </Box>
-
-        <Box sx={{ mt: 3, textAlign: 'center' }}>
-          <Typography variant="body2" sx={{ color: "#424242" }}>
-            Already have an account? <Link to="/signin" style={{ color: "#FF6B35", fontWeight: 600, textDecoration: "none" }}>Sign In</Link>
-          </Typography>
-        </Box>
+          <Box sx={{ mt: 3, textAlign: 'center' }}>
+            <Typography variant="body2" sx={{ color: "#424242" }}>
+              Already have an account? <Link to="/signin" style={{ color: "#FF6B35", fontWeight: 600, textDecoration: "none" }}>Sign In</Link>
+            </Typography>
+          </Box>
         </Paper>
       </Box>
 
