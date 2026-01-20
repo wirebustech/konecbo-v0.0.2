@@ -39,8 +39,7 @@ jobs:
           
           # Copy essential files
           cp -r build deployment_artifact/
-          cp -r server deployment_artifact/
-          cp server.js deployment_artifact/
+          cp -r server/* deployment_artifact/
           cp package.json deployment_artifact/
           cp package-lock.json deployment_artifact/
           cp web.config deployment_artifact/
