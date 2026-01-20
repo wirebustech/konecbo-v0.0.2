@@ -1,69 +1,90 @@
 const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const path = require('path');
-const app = express();
 require('dotenv').config();
 
-// Try to load database config, but don't crash if it fails (for batch 1 readiness)
-const { Pool } = require('pg');
+const authRoutes = require('./routes/authRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
-// Initialize Database Pool directly here to avoid path resolution issues in Azure artifact
-const pool = new Pool({
-    host: process.env.DB_HOST || 'konecbo-db.postgres.database.azure.com',
-    port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'konecbo',
-    user: process.env.DB_USER || 'konecboadmin',
-    password: process.env.DB_PASSWORD,
-    ssl: { rejectUnauthorized: false }, // Critical for Azure
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 5000,
-});
+const app = express();
+const PORT = process.env.PORT || 8080;
 
-pool.on('connect', () => {
-    console.log('✅ Connected to PostgreSQL database');
-});
+// Middleware
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP for now to prevent React issues
+}));
+app.use(morgan('dev')); // Logging
+app.use(cors({
+    origin: process.env.CLIENT_URL || ['http://localhost:3000', 'https://konecbo-main.azurewebsites.net'],
+    credentials: true
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-pool.on('error', (err) => {
-    console.error('❌ Unexpected error on idle client', err);
-});
-
-// Serve static files from the build directory
+// Serve static files from the React app (build folder)
+// We perform this check to ensure the folder exists, though usually it is copied during deployment.
 app.use(express.static(path.join(__dirname, 'build')));
 
-// Debug Middleware: Log all requests
-app.use((req, res, next) => {
-    console.log(`[Request] ${req.method} ${req.url}`);
-    next();
-});
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
-// Deployment Verification Route
-app.get('/verify-deployment', (req, res) => {
-    res.send(`Deployment Active. Timestamp: ${new Date().toISOString()}`);
-});
-
-// Health Check Endpoint
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'Konecbo Server is running' });
+    res.json({
+        success: true,
+        message: 'Konecbo API is running',
+        timestamp: new Date().toISOString()
+    });
 });
 
-// DB Connection Test Endpoint
-app.get('/api/db-test', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT NOW()');
-        res.json({ status: 'connected', time: result.rows[0].now });
-    } catch (err) {
-        console.error('Database connection error:', err);
-        res.status(500).json({ status: 'error', message: err.message });
-    }
+// API 404 Handler - If a request starts with /api/ but matches no route, return JSON 404
+app.use('/api/*', (req, res) => {
+    res.status(404).json({
+        success: false,
+        message: 'API route not found'
+    });
 });
 
-// Handle React routing, return all requests to React app
-// Using Regex /.*/ because string '*' is invalid in newer path-to-regexp used by Express 5
-app.get(/.*/, (req, res) => {
+// SPA Catch-all Handler - For any other request, send back React's index.html
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(err.status || 500).json({
+        success: false,
+        message: err.message || 'Internal server error'
+    });
 });
+
+// Start server
+const createTables = require('./scripts/initDatabase');
+
+const startServer = async () => {
+    try {
+        // Initialize database tables on startup
+        console.log('🔄 Initializing database...');
+        await createTables();
+        console.log('✅ Database initialized successfully');
+
+        app.listen(PORT, () => {
+            console.log(`🚀 Konecbo API server running on port ${PORT}`);
+            console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:3000'}`);
+        });
+    } catch (error) {
+        console.error('❌ Failed to start server:', error);
+        // We might not want to exit if DB fails transiently, but for initial setup it's safer
+        // to restart. Azure will restart the container.
+        process.exit(1);
+    }
+};
+
+startServer();
+
+module.exports = app;
