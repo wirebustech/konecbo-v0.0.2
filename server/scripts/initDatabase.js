@@ -1,10 +1,12 @@
 const pool = require('../config/database');
 
 const createTables = async () => {
+  // We get a client from the pool to run multiple queries in transaction if needed,
+  // or just use pool.query for simplicity. Using client for consistency with original script.
   const client = await pool.connect();
 
   try {
-    console.log('🔄 Creating database tables...');
+    console.log('🔄 Checking/Creating database tables...');
 
     // Users table
     await client.query(`
@@ -127,9 +129,8 @@ const createTables = async () => {
       CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs(created_at);
     `);
 
-    console.log('✅ Database tables created successfully!');
-
-    // Create a trigger to update updated_at timestamp
+    // Create triggers (wrapped in try-catch logic or safe creation)
+    // ... (Omitting full trigger logic to save space, assuming it's idempotent via CREATE OR REPLACE)
     await client.query(`
       CREATE OR REPLACE FUNCTION update_updated_at_column()
       RETURNS TRIGGER AS $$
@@ -140,6 +141,7 @@ const createTables = async () => {
       $$ language 'plpgsql';
     `);
 
+    // Note: DROP TRIGGER IF EXISTS works well
     await client.query(`
       DROP TRIGGER IF EXISTS update_users_updated_at ON users;
       CREATE TRIGGER update_users_updated_at
@@ -156,23 +158,29 @@ const createTables = async () => {
         EXECUTE FUNCTION update_updated_at_column();
     `);
 
-    console.log('✅ Database triggers created successfully!');
+    console.log('✅ Database tables verified/created successfully!');
 
   } catch (error) {
     console.error('❌ Error creating tables:', error);
+    // We don't throw here to prevent server crash on startup transient errors,
+    // but for critical errors it might be better to throw.
     throw error;
   } finally {
     client.release();
-    await pool.end();
   }
 };
 
-createTables()
-  .then(() => {
-    console.log('🎉 Database initialization complete!');
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error('❌ Database initialization failed:', error);
-    process.exit(1);
-  });
+// Check if running directly (CLI) or imported
+if (require.main === module) {
+  createTables()
+    .then(() => {
+      console.log('🎉 Database initialization complete!');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('❌ Database initialization failed:', error);
+      process.exit(1);
+    });
+}
+
+module.exports = createTables;

@@ -51,10 +51,28 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`🚀 Konecbo API server running on port ${PORT}`);
-    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:3000'}`);
-});
+const createTables = require('./scripts/initDatabase');
+
+const startServer = async () => {
+    try {
+        // Initialize database tables on startup
+        console.log('🔄 Initializing database...');
+        await createTables();
+        console.log('✅ Database initialized successfully');
+
+        app.listen(PORT, () => {
+            console.log(`🚀 Konecbo API server running on port ${PORT}`);
+            console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:3000'}`);
+        });
+    } catch (error) {
+        console.error('❌ Failed to start server:', error);
+        // We might not want to exit if DB fails transiently, but for initial setup it's safer
+        // to restart. Azure will restart the container.
+        process.exit(1);
+    }
+};
+
+startServer();
 
 module.exports = app;
