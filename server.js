@@ -42,29 +42,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// DEBUG ENDPOINT - Remove in production
-const fs = require('fs');
-app.get('/api/debug-files', (req, res) => {
-    const rootFiles = fs.readdirSync(__dirname);
-    let buildFiles = [];
-    try {
-        buildFiles = fs.readdirSync(path.join(__dirname, 'build'));
-    } catch (e) {
-        buildFiles = ['Error reading build dir: ' + e.message];
-    }
-    let serverFiles = [];
-    try {
-        serverFiles = fs.readdirSync(path.join(__dirname, 'server'));
-    } catch (e) {
-        serverFiles = ['Error reading server dir: ' + e.message];
-    }
-    res.json({
-        root: __dirname,
-        rootFiles: rootFiles,
-        buildFiles: buildFiles,
-        serverFiles: serverFiles
-    });
-});
+
 
 // API 404 Handler - If a request starts with /api but matches no route, return JSON 404
 app.use('/api', (req, res) => {
@@ -102,7 +80,7 @@ const startServer = async () => {
         app.listen(PORT, () => {
             console.log(`🚀 Konecbo API server running on port ${PORT}`);
             console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:3000'}`);
+            console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'Default (localhost & Azure Domain)'}`);
         });
     } catch (error) {
         console.error('❌ Failed to start server:', error);
