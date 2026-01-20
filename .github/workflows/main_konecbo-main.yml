@@ -31,7 +31,7 @@ jobs:
         env:
           REACT_APP_API_URL: https://konecbo-main.azurewebsites.net/api
         run: |
-          npm ci
+          npm install
           npm run build
           
           # Create clean deployment directory
@@ -52,7 +52,7 @@ jobs:
           # We cannot rely on Azure to run 'npm install' automatically in all scenarios.
           # This ensures 'express' and 'pg' are present when the server starts.
           cd deployment_artifact
-          npm ci --production
+          npm install --production
           cd ..
 
       - name: Upload artifact for deployment job
