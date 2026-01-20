@@ -31,7 +31,9 @@ exports.register = async (req, res) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password, fullName, phoneNumber, region } = req.body;
+    // Accept country and researchInterests
+    // Map country to region for users table compatibility
+    const { email, password, fullName, phoneNumber, country, researchInterests } = req.body;
     const client = await pool.connect();
 
     try {
@@ -52,15 +54,36 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt);
 
+        // Start transaction
+        await client.query('BEGIN');
+
         // Create user
+        // Note: Mapping 'country' to 'region' column
         const result = await client.query(
             `INSERT INTO users (email, password_hash, full_name, auth_provider, role, phone_number, region) 
        VALUES ($1, $2, $3, $4, $5, $6, $7) 
        RETURNING id, uid, email, full_name, role, created_at`,
-            [email.toLowerCase(), passwordHash, fullName, 'email', 'researcher', phoneNumber, region]
+            [email.toLowerCase(), passwordHash, fullName, 'email', 'researcher', phoneNumber, country]
         );
 
         const user = result.rows[0];
+
+        // Create initial user profile with research interests
+        // Handle researchInterests as comma-separated string or array
+        let interestsArray = [];
+        if (Array.isArray(researchInterests)) {
+            interestsArray = researchInterests;
+        } else if (typeof researchInterests === 'string') {
+            interestsArray = researchInterests.split(',').map(i => i.trim()).filter(i => i);
+        }
+
+        await client.query(
+            `INSERT INTO user_profiles (user_id, country, research_interests, created_at, updated_at)
+             VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+            [user.id, country, interestsArray]
+        );
+
+        await client.query('COMMIT');
 
         // Generate JWT token
         const token = generateToken(user.id, user.email, user.role);
@@ -87,6 +110,7 @@ exports.register = async (req, res) => {
         });
 
     } catch (error) {
+        await client.query('ROLLBACK');
         console.error('Registration error:', error);
         res.status(500).json({
             success: false,

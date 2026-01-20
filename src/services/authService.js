@@ -43,14 +43,15 @@ api.interceptors.response.use(
 // Authentication Service
 const authService = {
     // Register with email/password
-    register: async (email, password, fullName, phoneNumber, region) => {
+    register: async (email, password, fullName, phoneNumber, country, researchInterests) => {
         try {
             const response = await api.post('/auth/register', {
                 email,
                 password,
                 fullName,
                 phoneNumber,
-                region,
+                country,
+                researchInterests,
             });
 
             if (response.data.success) {
