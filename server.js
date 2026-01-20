@@ -75,7 +75,7 @@ app.use('/api', (req, res) => {
 });
 
 // SPA Catch-all Handler - For any other request, send back React's index.html
-app.get('*', (req, res) => {
+app.get(/(.*)/, (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
