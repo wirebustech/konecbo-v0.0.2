@@ -5,8 +5,10 @@ const morgan = require('morgan');
 const path = require('path');
 require('dotenv').config();
 
-const authRoutes = require('./routes/authRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+// Note: In Azure deployment, server folder is copied as a subdirectory
+// So routes are at ./server/routes/
+const authRoutes = require('./server/routes/authRoutes');
+const adminRoutes = require('./server/routes/adminRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -24,7 +26,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the React app (build folder)
-// We perform this check to ensure the folder exists, though usually it is copied during deployment.
+// The build folder is at the root of the artifact
 app.use(express.static(path.join(__dirname, 'build')));
 
 // API Routes
@@ -50,10 +52,17 @@ app.get('/api/debug-files', (req, res) => {
     } catch (e) {
         buildFiles = ['Error reading build dir: ' + e.message];
     }
+    let serverFiles = [];
+    try {
+        serverFiles = fs.readdirSync(path.join(__dirname, 'server'));
+    } catch (e) {
+        serverFiles = ['Error reading server dir: ' + e.message];
+    }
     res.json({
         root: __dirname,
-        files: rootFiles,
-        buildFiles: buildFiles
+        rootFiles: rootFiles,
+        buildFiles: buildFiles,
+        serverFiles: serverFiles
     });
 });
 
@@ -80,7 +89,8 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const createTables = require('./scripts/initDatabase');
+// Note: In Azure, scripts are at ./server/scripts/
+const createTables = require('./server/scripts/initDatabase');
 
 const startServer = async () => {
     try {
@@ -96,8 +106,6 @@ const startServer = async () => {
         });
     } catch (error) {
         console.error('❌ Failed to start server:', error);
-        // We might not want to exit if DB fails transiently, but for initial setup it's safer
-        // to restart. Azure will restart the container.
         process.exit(1);
     }
 };
