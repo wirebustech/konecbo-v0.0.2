@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:5000/api'
-    : 'https://konecbo-main.azurewebsites.net/api';
+    : '/api';
 
 // Create axios instance with default config
 const api = axios.create({
