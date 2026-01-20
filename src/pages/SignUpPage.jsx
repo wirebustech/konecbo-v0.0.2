@@ -14,7 +14,7 @@ import Navbar from "../components/Navbar";
 import "../pages/Researcher/ResearcherDashboard.css";
 import axios from "axios";
 import authService from "../services/authService";
-import { Typography, Box, Button as MuiButton, Paper, TextField, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, InputAdornment, IconButton } from "@mui/material";
+import { Typography, Box, Button as MuiButton, Paper, TextField, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, InputAdornment, IconButton, Container } from "@mui/material";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
