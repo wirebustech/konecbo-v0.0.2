@@ -78,7 +78,7 @@ const startServer = async () => {
         console.log('✅ Database initialized successfully');
 
         app.listen(PORT, () => {
-            console.log(`🚀 Konecbo API server running on port ${PORT}`);
+            console.log(`🚀 Konecbo API v0.0.3 (Fixed Build) running on port ${PORT}`);
             console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
             console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'Default (localhost & Azure Domain)'}`);
         });
