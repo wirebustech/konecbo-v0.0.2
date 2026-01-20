@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db, auth } from '../../config/firebaseConfig';
-import { collection, getDocs, query, where, doc, getDoc, onSnapshot, orderBy} from 'firebase/firestore';
 import './ResearcherDashboard.css';
 import axios from "axios";
 import Footer from '../../components/Footer';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useResearcherDashboard } from './researcherDashboardLogic';
 // MUI Components
-import { 
+import {
   Button,
   IconButton,
   Menu,
@@ -39,10 +37,10 @@ const MessageNotification = ({ messages, unreadCount, onMessageClick, selectedMe
   const [anchorEl, setAnchorEl] = useState(null);
 
   return (
-    <Badge 
-      color="error" 
+    <Badge
+      color="error"
       badgeContent={unreadCount}
-      sx={{ 
+      sx={{
         '& .MuiBadge-badge': {
           right: 8,
           top: 8
@@ -74,10 +72,10 @@ const MessageNotification = ({ messages, unreadCount, onMessageClick, selectedMe
         }}
       >
         <Box sx={{ p: 2 }}>
-          <Box sx={{ 
-            display: 'flex', 
+          <Box sx={{
+            display: 'flex',
             color: '#B1EDE8',
-            justifyContent: 'space-between', 
+            justifyContent: 'space-between',
             alignItems: 'center',
             borderBottom: '1px solid #2a3a57',
             pb: 1,
@@ -160,26 +158,26 @@ const ResearcherDashboard = () => {
     userId, setUserId,
     hasProfile, setHasProfile,
     collabListings, setCollabListings,
-    searchTerm, 
-    searchResults, 
+    searchTerm,
+    searchResults,
     dropdownVisible, setDropdownVisible,
-    showNoResults, 
+    showNoResults,
     filteredListings, setFilteredListings,
     userName, setUserName,
     setMessages,
-    
+
     setIpAddress,
     anchorEl, setAnchorEl,
     selectedMessage, setSelectedMessage,
     cardMenuAnchor, setCardMenuAnchor,
     cardMenuId, setCardMenuId,
     showReviewersDialog, setShowReviewersDialog,
-    reviewersForProject, 
+    reviewersForProject,
     reviewRequests, setReviewRequests,
-    expandedSummaries, 
+    expandedSummaries,
     deleteDialogOpen, setDeleteDialogOpen,
     setListingToDelete,
-    
+
     pendingReviewRef,
     handleAcceptReviewRequest,
     handleDeclineReviewRequest,
@@ -203,181 +201,8 @@ const ResearcherDashboard = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!userId) return;
-    const q = query(
-      collection(db, "reviewRequests"),
-      where("researcherId", "==", userId),
-      where("status", "==", "pending")
-    );
-    const unsub = onSnapshot(q, async (snapshot) => {
-      const requests = await Promise.all(snapshot.docs.map(async (docSnap) => {
-        const data = docSnap.data();
-        // Fetch reviewer info
-        let reviewerName = "Unknown Reviewer";
-        let reviewerEmail = "";
-        try {
-          const reviewerDoc = await getDoc(doc(db, "users", data.reviewerId));
-          if (reviewerDoc.exists()) {
-            reviewerName = reviewerDoc.data().name || reviewerName;
-            reviewerEmail = reviewerDoc.data().email || "";
-          }
-        } catch {}
-        // Fetch project info
-        let projectTitle = "Unknown Project";
-        let projectSummary = "";
-        try {
-          const projectDoc = await getDoc(doc(db, "research-listings", data.listingId));
-          if (projectDoc.exists()) {
-            projectTitle = projectDoc.data().title || projectTitle;
-            projectSummary = projectDoc.data().summary || "";
-          }
-        } catch {}
-        return {
-          id: docSnap.id,
-          ...data,
-          reviewerName,
-          reviewerEmail,
-          projectTitle,
-          projectSummary,
-        };
-      }));
-      setReviewRequests(requests);
-    });
-    return () => unsub();
-  }, [userId, setReviewRequests]);
+  // Duplicate useEffects removed. Logic is handled in useResearcherDashboard hook.
 
-  useEffect(() => {
-    const fetchIpAddress = async () => {
-      try {
-        const response = await axios.get("https://api.ipify.org?format=json");
-        setIpAddress(response.data.ip);
-      } catch (error) {
-        console.error("Error fetching IP address:", error);
-      }
-    };
-    fetchIpAddress();
-  }, [setIpAddress]);
-
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/signin');
-      return;
-    }
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) setUserId(user.uid);
-      else {
-        localStorage.removeItem('authToken');
-        navigate('/signin');
-      }
-    });
-    return () => unsubscribe();
-  }, [navigate, setUserId]);
-
-  useEffect(() => {
-    if (!userId) return;
-    
-    const fetchUserProfile = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', userId));
-        if (userDoc.exists()) {
-          setHasProfile(true);
-          setUserName(userDoc.data().name || 'Researcher');
-        } else {
-          navigate('/researcher-edit-profile');
-        }
-      } catch (err) {
-      }
-    };
-    fetchUserProfile();
-  }, [userId, navigate, setHasProfile, setUserName]);
-
-  useEffect(() => {
-    if (!userId) return;
-    
-    const messagesRef = collection(db, 'users', userId, 'messages');
-    const messagesQuery = query(messagesRef, orderBy('timestamp', 'desc'));
-    
-    const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
-      const messagesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate() || new Date()
-      }));
-      setMessages(messagesData);
-    });
-
-    const collabQuery = query(
-      collection(db, "collaborations"),
-      where("collaboratorId", "==", userId)
-    );
-    
-    const unsubscribeCollabs = onSnapshot(collabQuery, async (snapshot) => {
-      const collabs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const listings = await Promise.all(
-        collabs.map(async collab => {
-          const listingDoc = await getDoc(doc(db, "research-listings", collab.listingId));
-          return listingDoc.exists() ? { id: listingDoc.id, ...listingDoc.data() } : null;
-        })
-      );
-      setCollabListings(listings.filter(Boolean));
-    });
-
-    return () => {
-      unsubscribeMessages();
-      unsubscribeCollabs();
-    };
-  }, [userId, setCollabListings, setMessages]);
-
-  useEffect(() => {
-    if (!userId || !hasProfile) return;
-    
-    const fetchListings = async () => {
-      try {
-        const q = query(collection(db, 'research-listings'));
-        const querySnapshot = await getDocs(q);
-        const data = await Promise.all(
-          querySnapshot.docs.map(async (docSnap) => {
-            const listing = { id: docSnap.id, ...docSnap.data() };
-            try {
-              const researcherDoc = await getDoc(doc(db, 'users', listing.userId));
-              return {
-                ...listing,
-                researcherName: researcherDoc.exists() ? researcherDoc.data().name : 'Unknown Researcher'
-              };
-            } catch {
-              return { ...listing, researcherName: 'Unknown Researcher' };
-            }
-          })
-        );
-        setAllListings(data);
-      } catch (error) {
-        console.error("Error fetching listings:", error);
-      }
-    };
-    fetchListings();
-  }, [userId, hasProfile, setAllListings]);
-
-  useEffect(() => {
-    if (!userId || !hasProfile) return;
-    
-    const fetchMyListings = async () => {
-      try {
-        const q = query(collection(db, 'research-listings'), where('userId', '==', userId));
-        const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setMyListings(data);
-      } catch (error) {
-        console.error("Error fetching user listings:", error);
-      }
-    };
-    fetchMyListings();
-  }, [userId, hasProfile, setMyListings]);
-
-  useEffect(() => {
-    setFilteredListings(myListings);
-  }, [myListings, setFilteredListings]);
 
 
   return (
@@ -422,7 +247,7 @@ const ResearcherDashboard = () => {
           </section>
         </nav>
         <nav style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <MessageNotification 
+          <MessageNotification
             messages={combinedNotifications}
             unreadCount={combinedNotifications.filter(msg => !msg.read).length}
             onMessageClick={handleMessageClick}
@@ -467,7 +292,7 @@ const ResearcherDashboard = () => {
             <MenuItem onClick={handleAddListing}>New Research</MenuItem>
             <MenuItem onClick={() => navigate('/friends')}>Friends</MenuItem>
             <MenuItem onClick={handleCollaborate}>Collaborate</MenuItem>
-                      <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </nav>
       </header>
@@ -477,11 +302,11 @@ const ResearcherDashboard = () => {
         {/* Search Section */}
         <section style={{ maxWidth: 800, margin: '0 auto', marginBottom: 32 }}>
           <form
-            onSubmit={(e) => { 
+            onSubmit={(e) => {
               e.preventDefault();
               handleSearch();
             }}
-            style={{ 
+            style={{
               padding: 12,
               display: 'flex',
               gap: 12,
@@ -506,7 +331,7 @@ const ResearcherDashboard = () => {
                 }
               }}
             />
-            <Button 
+            <Button
               type="button"
               variant="contained"
               onClick={handleClear}
@@ -518,7 +343,7 @@ const ResearcherDashboard = () => {
                 px: 3,
                 fontWeight: 600,
                 boxShadow: 'none',
-                '&:hover': { 
+                '&:hover': {
                   bgcolor: '#5AA9A3',
                   color: 'var(--white)'
                 }
@@ -526,7 +351,7 @@ const ResearcherDashboard = () => {
             >
               Clear
             </Button>
-            <Button 
+            <Button
               type="button"
               variant="contained"
               onClick={handleSearch}
@@ -538,7 +363,7 @@ const ResearcherDashboard = () => {
                 px: 3,
                 fontWeight: 600,
                 boxShadow: 'none',
-                '&:hover': { 
+                '&:hover': {
                   bgcolor: '#5AA9A3',
                   color: 'var(--white)'
                 }
@@ -1019,7 +844,7 @@ const ResearcherDashboard = () => {
       <footer>
         <Footer />
       </footer>
-      <FloatingHelpChat chatId={`support_${auth.currentUser?.uid}`} title="Contact Admin Support" />
+      <FloatingHelpChat chatId={`support_${userId}`} title="Contact Admin Support" />
     </main>
   );
 };

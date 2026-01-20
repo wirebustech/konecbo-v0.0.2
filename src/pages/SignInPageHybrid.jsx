@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { auth, provider } from "../config/firebaseConfig";
-import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -16,7 +14,6 @@ import {
     TextField,
     InputAdornment,
     IconButton,
-    Divider,
     Container
 } from "@mui/material";
 
@@ -39,58 +36,10 @@ function SignInPageHybrid() {
         setLoading(true);
         try {
             // Try SQL database first
-            try {
-                const result = await authService.login(email, password);
-                if (result.success) {
-                    toast.success("Welcome back!");
-                    const userRole = result.user.role || "researcher";
-                    if (userRole === "admin") {
-                        navigate("/admin");
-                    } else if (userRole === "reviewer") {
-                        navigate("/reviewer");
-                    } else {
-                        navigate("/researcher-dashboard");
-                    }
-                    return;
-                }
-            } catch (sqlError) {
-                // If SQL fails, try Firebase
-                console.log("SQL login failed, trying Firebase...");
-                await signInWithEmailAndPassword(auth, email, password);
+            const result = await authService.login(email, password);
+            if (result.success) {
                 toast.success("Welcome back!");
-                navigate("/researcher-dashboard");
-                return;
-            }
-        } catch (error) {
-            console.error("Sign-in error:", error);
-            if (error.code === "auth/wrong-password" || error.code === "auth/user-not-found") {
-                toast.error("Invalid email or password");
-            } else {
-                toast.error(error.message || "Sign-in failed. Please try again.");
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Handle Google sign-in
-    const handleGoogleSignIn = async () => {
-        setLoading(true);
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-
-            // Send to SQL backend
-            const authResult = await authService.googleAuth(
-                user.email,
-                user.displayName || "User",
-                user.uid,
-                user.photoURL || ""
-            );
-
-            if (authResult.success) {
-                toast.success("Welcome back!");
-                const userRole = authResult.user.role || "researcher";
+                const userRole = result.user.role || "researcher";
                 if (userRole === "admin") {
                     navigate("/admin");
                 } else if (userRole === "reviewer") {
@@ -100,11 +49,11 @@ function SignInPageHybrid() {
                 }
             }
         } catch (error) {
-            if (error.code === "auth/popup-closed-by-user") {
-                toast.info("Sign-in cancelled");
+            console.error("Sign-in error:", error);
+            if (error && error.message && error.message.includes("Invalid email or password")) {
+                toast.error("Invalid email or password");
             } else {
-                console.error("Google sign-in error:", error);
-                toast.error(error.message || "Google sign-in failed. Please try again.");
+                toast.error(error.message || "Sign-in failed. Please try again.");
             }
         } finally {
             setLoading(false);
@@ -216,56 +165,9 @@ function SignInPageHybrid() {
                         </Typography>
                     </Box>
 
-                    {/* Google Sign-In Button */}
-                    <MuiButton
-                        onClick={handleGoogleSignIn}
-                        disabled={loading}
-                        variant="outlined"
-                        fullWidth
-                        sx={{
-                            borderColor: "#E2E8F0",
-                            color: "#1E293B",
-                            padding: "0.875rem 1.5rem",
-                            borderRadius: "12px",
-                            fontSize: { xs: "0.9rem", sm: "1rem" },
-                            fontWeight: 600,
-                            textTransform: "none",
-                            backgroundColor: "#FFFFFF",
-                            mb: 3,
-                            transition: "all 0.3s ease",
-                            '&:hover': {
-                                borderColor: "#CBD5E1",
-                                backgroundColor: "#F8FAFC",
-                                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                                transform: "translateY(-2px)",
-                            },
-                            '&:disabled': {
-                                borderColor: "#E2E8F0",
-                                color: "#94A3B8",
-                            },
-                        }}
-                    >
-                        <img
-                            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                            alt=""
-                            style={{
-                                height: "20px",
-                                width: "20px",
-                                marginRight: "12px",
-                            }}
-                        />
-                        Continue with Google
-                    </MuiButton>
-
-                    <Divider sx={{ my: 3 }}>
-                        <Typography variant="body2" sx={{ color: "#94A3B8", px: 2, fontSize: "0.875rem" }}>
-                            OR
-                        </Typography>
-                    </Divider>
-
                     {/* Sign-In Form */}
                     <form onSubmit={handleSignIn}>
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, width: "200%", }}>
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, width: "100%", }}>
                             {/* Email */}
                             <TextField
                                 label="Email Address"

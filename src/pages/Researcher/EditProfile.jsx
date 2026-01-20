@@ -5,13 +5,13 @@ import './ResearcherDashboard.css';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import MenuIcon from '@mui/icons-material/Menu';
 import Footer from '../../components/Footer';
-import { 
-  Box, Button, IconButton, Menu, MenuItem, Typography, 
+import {
+  Box, Button, IconButton, Menu, MenuItem, Typography,
   TextField, Select, InputLabel, FormControl, Avatar,
-   Container 
+  Container
 } from '@mui/material';
 import { useEditProfileLogic } from './researcherEditProfileLogic';
-import { auth } from '../../config/firebaseConfig';
+
 
 const researchAreas = [
   'Physics', 'Chemistry', 'Biology', 'Computer Science', 'Mathematics',
@@ -67,26 +67,11 @@ const EditProfile = () => {
     }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/signin');
-      return;
-    }
 
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        localStorage.removeItem('authToken');
-        navigate('/signin');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
 
   return (
-    <Box component="main" sx={{ 
-      minHeight: '100vh', 
+    <Box component="main" sx={{
+      minHeight: '100vh',
       bgcolor: '#f5f7fa',
       display: 'flex',
       flexDirection: 'column'
@@ -115,13 +100,13 @@ const EditProfile = () => {
             Update your research profile information
           </Typography>
         </Box>
-        <IconButton 
+        <IconButton
           onClick={(e) => setMenuAnchorEl(e.currentTarget)}
           sx={{ color: 'var(--white)' }}
         >
           <MenuIcon />
         </IconButton>
-        
+
         <Menu
           anchorEl={menuAnchorEl}
           open={Boolean(menuAnchorEl)}
@@ -159,9 +144,9 @@ const EditProfile = () => {
       </Box>
 
       {/* Profile Form - Now using Container with maxWidth="md" */}
-      <Container 
-        maxWidth="md" 
-        sx={{ 
+      <Container
+        maxWidth="md"
+        sx={{
           flex: 1,
           py: 4,
           px: { xs: 2, sm: 3 },
@@ -169,8 +154,8 @@ const EditProfile = () => {
           flexDirection: 'column'
         }}
       >
-        <Box 
-          component="form" 
+        <Box
+          component="form"
           onSubmit={handleSubmitWithValidation}
           sx={{
             width: '100%',
@@ -185,11 +170,11 @@ const EditProfile = () => {
           }}
         >
           {/* Profile Picture Section */}
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            mb: 4 
+          <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            mb: 4
           }}>
             <Avatar
               src={typeof profile.profilePicture === 'string' ? profile.profilePicture : ''}
@@ -221,9 +206,9 @@ const EditProfile = () => {
           </Box>
 
           {/* Personal Information Section */}
-          <Typography variant="h6" sx={{ 
-            color: '#64CCC5', 
-            mb: 3, 
+          <Typography variant="h6" sx={{
+            color: '#64CCC5',
+            mb: 3,
             borderBottom: '1px solid #64CCC5',
             pb: 1,
             fontSize: '1.1rem'
@@ -231,11 +216,11 @@ const EditProfile = () => {
             Personal Information
           </Typography>
 
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: { sm: '1fr 1fr' }, 
-            gap: 3, 
-            mb: 3 
+          <Box sx={{
+            display: 'grid',
+            gridTemplateColumns: { sm: '1fr 1fr' },
+            gap: 3,
+            mb: 3
           }}>
             {/* Title Field */}
             <FormControl fullWidth>
@@ -291,7 +276,7 @@ const EditProfile = () => {
             error={errors.email}
             helperText={errors.email ? "Valid email is required" : ""}
             fullWidth
-            sx={{ 
+            sx={{
               mb: 3,
               '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
               '& .MuiInputLabel-root': { color: '#64CCC5' },
@@ -351,9 +336,9 @@ const EditProfile = () => {
           />
 
           {/* Research Information Section */}
-          <Typography variant="h6" sx={{ 
-            color: '#64CCC5', 
-            mb: 3, 
+          <Typography variant="h6" sx={{
+            color: '#64CCC5',
+            mb: 3,
             mt: 4,
             borderBottom: '1px solid #64CCC5',
             pb: 1,
@@ -412,7 +397,7 @@ const EditProfile = () => {
             multiline
             rows={6}
             fullWidth
-            sx={{ 
+            sx={{
               mb: 3,
               '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
               '& .MuiInputLabel-root': { color: '#64CCC5' },
@@ -424,8 +409,8 @@ const EditProfile = () => {
           />
 
           {/* Form Actions */}
-          <Box sx={{ 
-            display: 'flex', 
+          <Box sx={{
+            display: 'flex',
             justifyContent: 'flex-end',
             mt: 'auto',
             pt: 3,
@@ -466,7 +451,7 @@ const EditProfile = () => {
           </Box>
         </Box>
       </Container>
-      
+
       <Footer />
     </Box>
   );

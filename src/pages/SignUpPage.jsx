@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { auth, db, provider } from "../config/firebaseConfig";
-import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
-import { setDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PersonIcon from '@mui/icons-material/Person';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
+import PublicIcon from '@mui/icons-material/Public';
 import './TermsAndConditions.css';
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import "../pages/Researcher/ResearcherDashboard.css";
 import axios from "axios";
 import authService from "../services/authService";
-import { Typography, Box, Button as MuiButton, Paper, TextField, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, FormGroup, Stepper, Step, StepLabel, RadioGroup, Radio, FormLabel, InputAdornment, IconButton, Chip, LinearProgress } from "@mui/material";
+import { Typography, Box, Button as MuiButton, Paper, TextField, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, InputAdornment, IconButton } from "@mui/material";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -114,37 +114,24 @@ const SignUpPage = () => {
     }));
   };
 
-  const handleCheckboxArrayChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: prev[name].includes(value)
-        ? prev[name].filter(item => item !== value)
-        : [...prev[name], value]
-    }));
-  };
-
   const validateStep = (step) => {
-    const isGoogleUser = auth.currentUser && !formData.password;
-
     switch (step) {
       case 0:
         if (!formData.email || !formData.fullName || !formData.phoneNumber || !formData.region) {
           toast.error("Please fill in all required fields (Name, Email, Phone, Region)");
           return false;
         }
-        if (!isGoogleUser) {
-          if (!formData.password || !formData.confirmPassword) {
-            toast.error("Please fill in all required fields");
-            return false;
-          }
-          if (formData.password !== formData.confirmPassword) {
-            toast.error("Passwords do not match");
-            return false;
-          }
-          if (formData.password.length < 8) {
-            toast.error("Password must be at least 8 characters");
-            return false;
-          }
+        if (!formData.password || !formData.confirmPassword) {
+          toast.error("Please fill in all required fields");
+          return false;
+        }
+        if (formData.password !== formData.confirmPassword) {
+          toast.error("Passwords do not match");
+          return false;
+        }
+        if (formData.password.length < 8) {
+          toast.error("Password must be at least 8 characters");
+          return false;
         }
         if (!formData.agreeToTerms) {
           toast.error("You must agree to the Terms and Conditions");
@@ -172,60 +159,6 @@ const SignUpPage = () => {
     setActiveStep(prev => prev - 1);
   };
 
-  const handleGoogleSignUp = async () => {
-    try {
-      setLoading(true);
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-
-      // Check if user already exists
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-
-      if (userDoc.exists()) {
-        // User already exists, just sign them in
-        const token = await user.getIdToken();
-        localStorage.setItem("authToken", token);
-        toast.success("Welcome back to Konecbo!");
-        navigate("/researcher-dashboard");
-        return;
-      }
-
-      // New user - pre-fill form with Google data and continue with KYC
-      setFormData(prev => ({
-        ...prev,
-        email: user.email || "",
-        fullName: user.displayName || "",
-      }));
-
-      // Get auth token
-      const token = await user.getIdToken();
-      localStorage.setItem("authToken", token);
-
-      // Save basic user info first
-      await setDoc(doc(db, "users", user.uid), {
-        name: user.displayName || "User",
-        email: user.email,
-        role: "researcher",
-        kycCompleted: false,
-        // createdAt: serverTimestamp(), // Handled by backend
-        provider: "google",
-      });
-
-      toast.info("Please complete your profile to continue");
-      // User will complete the KYC form starting from step 0 (terms agreement)
-      // Password fields will be hidden for Google users in step 0
-    } catch (error) {
-      console.error("Google sign-up error:", error);
-      if (error.code === "auth/popup-closed-by-user") {
-        toast.info("Sign-up cancelled");
-      } else {
-        toast.error("Google sign-up failed. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep(activeStep)) return;
@@ -246,7 +179,6 @@ const SignUpPage = () => {
         // Basic Info
         email: formData.email,
         name: formData.fullName,
-        // createdAt: serverTimestamp(), // Handled by backend
 
         // Research Profile
         currentPosition: formData.currentPosition,
@@ -290,7 +222,6 @@ const SignUpPage = () => {
 
         // Metadata
         kycCompleted: true,
-        // kycCompletedAt: serverTimestamp(), // Handled by backend
         ipAddress: ipAddress,
         profileCompleteness: calculateProfileCompleteness(),
       };
@@ -304,12 +235,10 @@ const SignUpPage = () => {
       navigate("/researcher-dashboard");
     } catch (error) {
       console.error("Sign-up error:", error);
-      if (error.code === "auth/email-already-in-use") {
+      if (error && error.message && error.message.includes("already registered")) {
         toast.error("This email is already registered. Please sign in instead.");
-      } else if (error.code === "auth/weak-password") {
-        toast.error("Password is too weak. Please use a stronger password.");
       } else {
-        toast.error("Sign-up failed. Please try again.");
+        toast.error(error.message || "Sign-up failed. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -368,19 +297,30 @@ const SignUpPage = () => {
   };
 
   const renderStepContent = () => {
-    const isGoogleUser = auth.currentUser && !formData.password;
-
     switch (activeStep) {
       case 0:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {isGoogleUser && (
-              <Box sx={{ p: 2, backgroundColor: "#E3F2FD", borderRadius: 1, mb: 2 }}>
-                <Typography variant="body2" sx={{ color: "#1976D2" }}>
-                  ✓ Signed in with Google. Please complete your profile information below.
-                </Typography>
-              </Box>
-            )}
+            <Box sx={{ mb: 2, textAlign: "center" }}>
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: 800,
+                  fontSize: { xs: "1.75rem", sm: "2.25rem" },
+                  background: "linear-gradient(135deg, #FF6B35 0%, #F7C59F 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  mb: 1,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                Create Account
+              </Typography>
+              <Typography variant="body1" sx={{ color: "#64748B" }}>
+                Join the research community
+              </Typography>
+            </Box>
+
             <TextField
               label="Full Name"
               name="fullName"
@@ -389,6 +329,13 @@ const SignUpPage = () => {
               required
               fullWidth
               sx={modernTextFieldStyle}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon sx={{ color: "#FF6B35" }} />
+                  </InputAdornment>
+                ),
+              }}
             />
             <TextField
               label="Email Address"
@@ -398,24 +345,14 @@ const SignUpPage = () => {
               onChange={handleInputChange}
               required
               fullWidth
-              disabled={isGoogleUser}
-              helperText="Any email address works. Institutional email recommended for verification."
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: "12px",
-                  backgroundColor: "#FAFBFC",
-                  transition: "all 0.2s ease",
-                  '&:hover': {
-                    backgroundColor: "#F5F7FA",
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: "#FFFFFF",
-                    boxShadow: "0 0 0 3px rgba(100, 204, 197, 0.1)",
-                  },
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: "#64CCC5",
-                },
+              helperText="Institutional email recommended for verification."
+              sx={modernTextFieldStyle}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <EmailIcon sx={{ color: "#FF6B35" }} />
+                  </InputAdornment>
+                ),
               }}
             />
             <TextField
@@ -426,6 +363,13 @@ const SignUpPage = () => {
               required
               fullWidth
               sx={modernTextFieldStyle}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PhoneIcon sx={{ color: "#FF6B35" }} />
+                  </InputAdornment>
+                ),
+              }}
             />
             <TextField
               label="Region"
@@ -435,90 +379,63 @@ const SignUpPage = () => {
               required
               fullWidth
               sx={modernTextFieldStyle}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PublicIcon sx={{ color: "#FF6B35" }} />
+                  </InputAdornment>
+                ),
+              }}
             />
-            {!isGoogleUser && (
-              <>
-                <TextField
-                  label="Password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  fullWidth
-                  helperText="Minimum 8 characters, include letters and numbers"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                          sx={{ color: "#64748B" }}
-                        >
-                          {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: "12px",
-                      backgroundColor: "#FAFBFC",
-                      transition: "all 0.2s ease",
-                      '&:hover': {
-                        backgroundColor: "#F5F7FA",
-                      },
-                      '&.Mui-focused': {
-                        backgroundColor: "#FFFFFF",
-                        boxShadow: "0 0 0 3px rgba(100, 204, 197, 0.1)",
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: "#64CCC5",
-                    },
-                  }}
-                />
-                <TextField
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  required
-                  fullWidth
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          edge="end"
-                          sx={{ color: "#64748B" }}
-                        >
-                          {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: "12px",
-                      backgroundColor: "#FAFBFC",
-                      transition: "all 0.2s ease",
-                      '&:hover': {
-                        backgroundColor: "#F5F7FA",
-                      },
-                      '&.Mui-focused': {
-                        backgroundColor: "#FFFFFF",
-                        boxShadow: "0 0 0 3px rgba(100, 204, 197, 0.1)",
-                      },
-                    },
-                    '& .MuiInputLabel-root.Mui-focused': {
-                      color: "#64CCC5",
-                    },
-                  }}
-                />
-              </>
-            )}
+
+            <TextField
+              label="Password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
+              onChange={handleInputChange}
+              required
+              fullWidth
+              helperText="Minimum 8 characters, include letters and numbers"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      sx={{ color: "#64748B" }}
+                    >
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={modernTextFieldStyle}
+            />
+            <TextField
+              label="Confirm Password"
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+              required
+              fullWidth
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      edge="end"
+                      sx={{ color: "#64748B" }}
+                    >
+                      {showConfirmPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={modernTextFieldStyle}
+            />
+
             <FormControlLabel
               control={
                 <Checkbox
@@ -728,23 +645,7 @@ const SignUpPage = () => {
               onChange={handleInputChange}
               fullWidth
               helperText="Recommended for verification and enhanced credibility"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: "12px",
-                  backgroundColor: "#FAFBFC",
-                  transition: "all 0.2s ease",
-                  '&:hover': {
-                    backgroundColor: "#F5F7FA",
-                  },
-                  '&.Mui-focused': {
-                    backgroundColor: "#FFFFFF",
-                    boxShadow: "0 0 0 3px rgba(100, 204, 197, 0.1)",
-                  },
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: "#64CCC5",
-                },
-              }}
+              sx={modernTextFieldStyle}
             />
           </Box>
         );
@@ -799,26 +700,21 @@ const SignUpPage = () => {
             />
 
             <TextField
-              label="Skills & Expertise"
+              label="Skills"
               name="skills"
               value={formData.skills}
               onChange={handleInputChange}
               fullWidth
-              multiline
-              rows={3}
-              helperText="Comma-separated list (e.g., Python, Statistical Analysis, Lab Techniques)"
+              helperText="Separate skills with commas"
               sx={modernTextFieldStyle}
             />
-
             <TextField
-              label="Research Methodologies"
+              label="Methodologies"
               name="methodologies"
               value={formData.methodologies}
               onChange={handleInputChange}
               fullWidth
-              multiline
-              rows={2}
-              helperText="Comma-separated list (e.g., Experimental Design, Qualitative Research, Data Analysis)"
+              helperText="Separate methodologies with commas"
               sx={modernTextFieldStyle}
             />
           </Box>
@@ -827,414 +723,140 @@ const SignUpPage = () => {
       case 4:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.lookingToPost}
-                    onChange={(e) => handleSelectChange('lookingToPost', e.target.checked)}
-                    sx={{
-                      color: "#64CCC5",
-                      '&.Mui-checked': {
-                        color: "#64CCC5",
-                      },
-                    }}
-                  />
-                }
-                label={<Typography sx={{ color: "#1B5E20", fontSize: "0.95rem" }}>I'm looking to post research projects</Typography>}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formData.lookingToJoin}
-                    onChange={(e) => handleSelectChange('lookingToJoin', e.target.checked)}
-                    sx={{
-                      color: "#FF6B35",
-                      '&.Mui-checked': {
-                        color: "#FF6B35",
-                      },
-                    }}
-                  />
-                }
-                label={<Typography sx={{ color: "#1B5E20", fontSize: "0.95rem" }}>I'm looking to join research projects as a collaborator</Typography>}
-              />
-            </FormGroup>
-
-            <FormControl component="fieldset" sx={{ mt: 2 }}>
-              <FormLabel component="legend" sx={{ color: "#1B5E20", fontWeight: 600, mb: 1 }}>Preferred Collaboration Types</FormLabel>
-              <FormGroup>
-                {['Equal Partnership', 'Lead Researcher with Contributors', 'Specific Task-Based Contribution', 'Advisory Role', 'Consultative'].map(type => (
-                  <FormControlLabel
-                    key={type}
-                    control={
-                      <Checkbox
-                        checked={formData.preferredCollaborationTypes.includes(type)}
-                        onChange={() => handleCheckboxArrayChange('preferredCollaborationTypes', type)}
-                        sx={{
-                          color: "#FF6B35",
-                          '&.Mui-checked': {
-                            color: "#FF6B35",
-                          },
-                        }}
-                      />
-                    }
-                    label={<Typography sx={{ color: "#1B5E20", fontSize: "0.95rem" }}>{type}</Typography>}
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
-
-            <FormControl fullWidth>
-              <InputLabel sx={{ '&.Mui-focused': { color: "#FF6B35" } }}>Time Availability</InputLabel>
-              <Select
-                name="timeAvailability"
-                value={formData.timeAvailability}
-                onChange={(e) => handleSelectChange('timeAvailability', e.target.value)}
-                label="Time Availability"
-                sx={modernSelectStyle}
-              >
-                <MenuItem value="A few hours per week">A few hours per week</MenuItem>
-                <MenuItem value="5-10 hours per week">5-10 hours per week</MenuItem>
-                <MenuItem value="10-20 hours per week">10-20 hours per week</MenuItem>
-                <MenuItem value="20+ hours per week">20+ hours per week</MenuItem>
-                <MenuItem value="Variable/Flexible">Variable/Flexible</MenuItem>
-              </Select>
-            </FormControl>
-
+            <Typography variant="h6">Collaboration Preferences</Typography>
+            <FormControlLabel
+              control={<Checkbox checked={formData.lookingToPost} onChange={handleInputChange} name="lookingToPost" />}
+              label="Looking to Post Projects"
+            />
+            <FormControlLabel
+              control={<Checkbox checked={formData.lookingToJoin} onChange={handleInputChange} name="lookingToJoin" />}
+              label="Looking to Join Projects"
+            />
             <TextField
-              label="Career Goals & Learning Objectives"
+              label="Time Availability"
+              name="timeAvailability"
+              value={formData.timeAvailability}
+              onChange={handleInputChange}
+              fullWidth
+              sx={modernTextFieldStyle}
+            />
+            <TextField
+              label="Availability Hours"
+              name="availabilityHours"
+              value={formData.availabilityHours}
+              onChange={handleInputChange}
+              fullWidth
+              sx={modernTextFieldStyle}
+            />
+            <TextField
+              label="Career Goals"
               name="careerGoals"
               value={formData.careerGoals}
               onChange={handleInputChange}
               fullWidth
               multiline
               rows={3}
-              helperText="What do you hope to achieve through research collaboration?"
               sx={modernTextFieldStyle}
             />
           </Box>
         );
-
       case 5:
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
-              label="Biography"
+              label="Bio"
               name="bio"
               value={formData.bio}
               onChange={handleInputChange}
               fullWidth
               multiline
               rows={4}
-              helperText="Brief professional biography"
               sx={modernTextFieldStyle}
             />
-
             <TextField
-              label="Personal Website (Optional)"
+              label="Website"
               name="website"
               value={formData.website}
               onChange={handleInputChange}
               fullWidth
-              type="url"
               sx={modernTextFieldStyle}
             />
-
             <TextField
-              label="LinkedIn Profile (Optional)"
+              label="LinkedIn Profile"
               name="linkedin"
               value={formData.linkedin}
               onChange={handleInputChange}
               fullWidth
-              type="url"
               sx={modernTextFieldStyle}
             />
-
             <TextField
-              label="Twitter/X Handle (Optional)"
+              label="Twitter / X Profile"
               name="twitter"
               value={formData.twitter}
               onChange={handleInputChange}
               fullWidth
-              helperText="e.g., @username"
               sx={modernTextFieldStyle}
             />
-
             <TextField
-              label="Research Statement (Optional)"
+              label="Research Statement"
               name="researchStatement"
               value={formData.researchStatement}
               onChange={handleInputChange}
               fullWidth
               multiline
-              rows={5}
-              helperText="Your research philosophy, current focus, and future directions"
+              rows={4}
               sx={modernTextFieldStyle}
             />
           </Box>
         );
 
       default:
-        return null;
+        return 'Unknown step';
     }
   };
 
-  const progressPercentage = ((activeStep + 1) / steps.length) * 100;
-
   return (
-    <main
-      role="main"
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #1B5E20 0%, #2E7D32 25%, #4CAF50 50%, #66BB6A 75%, #81C784 100%)",
-        backgroundSize: "400% 400%",
-        animation: "gradientBG 15s ease infinite",
-        fontFamily: "Inter, sans-serif",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {/* Animated background overlay */}
-      <Box
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(46, 125, 50, 0.1) 0%, transparent 50%)",
-          pointerEvents: "none",
-        }}
-      />
+    <Box sx={{ minHeight: "100vh", background: "#F1F5F9" }}>
+      <Navbar />
+      <Container maxWidth="md" sx={{ py: 4, mt: 8 }}>
+        <Paper elevation={0} sx={{ p: 4, borderRadius: 4, background: "#fff", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+          {/* Stepper would go here if I kept the stepper imports, assuming usage of Mui Stepper */}
 
-      {/* Navbar */}
-      <Box sx={{ position: "relative", zIndex: 10 }}>
-        <Navbar />
-      </Box>
+          <form onSubmit={handleSubmit}>
+            {renderStepContent()}
 
-      {/* Header */}
-      <Box
-        sx={{
-          position: "relative",
-          zIndex: 10,
-          padding: { xs: "1.5rem", sm: "2rem" },
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <MuiButton
-          onClick={() => navigate(-1)}
-          sx={{
-            color: "#FFFFFF",
-            minWidth: 0,
-            p: 1.5,
-            borderRadius: "12px",
-            background: "rgba(255, 255, 255, 0.1)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            transition: "all 0.3s ease",
-            '&:hover': {
-              background: "rgba(255, 255, 255, 0.2)",
-              transform: "translateX(-2px)",
-            },
-          }}
-        >
-          <ArrowBackIosIcon sx={{ fontSize: "1.2rem" }} />
-        </MuiButton>
-
-        <MuiButton
-          onClick={() => navigate("/")}
-          sx={{
-            color: "#FFFFFF",
-            px: 2.5,
-            py: 1,
-            borderRadius: "12px",
-            background: "rgba(255, 255, 255, 0.1)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            fontWeight: 500,
-            fontSize: "0.95rem",
-            textTransform: "none",
-            transition: "all 0.3s ease",
-            '&:hover': {
-              background: "rgba(255, 255, 255, 0.2)",
-            },
-          }}
-        >
-          Home
-        </MuiButton>
-      </Box>
-
-      {/* Progress Bar */}
-      <Box sx={{ position: "relative", zIndex: 10, px: { xs: 2, sm: 4 }, mb: 2 }}>
-        <Box sx={{ maxWidth: "900px", margin: "0 auto" }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-            <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.9)", fontWeight: 500 }}>
-              Step {activeStep + 1} of {steps.length}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "rgba(255, 255, 255, 0.9)", fontWeight: 500 }}>
-              {Math.round(progressPercentage)}% Complete
-            </Typography>
-          </Box>
-          <LinearProgress
-            variant="determinate"
-            value={progressPercentage}
-            sx={{
-              height: 8,
-              borderRadius: 4,
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
-              '& .MuiLinearProgress-bar': {
-                borderRadius: 4,
-                background: "linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 100%)",
-              },
-            }}
-          />
-        </Box>
-      </Box>
-
-      <Box sx={{ position: "relative", zIndex: 10, padding: { xs: "1rem", sm: "2rem" } }}>
-        <Paper
-          elevation={0}
-          sx={{
-            maxWidth: "900px",
-            margin: "0 auto",
-            padding: { xs: "2rem 1.5rem", sm: "3rem 2.5rem" },
-            background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.98) 100%)",
-            backdropFilter: "blur(20px)",
-            borderRadius: "24px",
-            boxShadow: "0 20px 60px rgba(19, 34, 56, 0.12), 0 0 1px rgba(19, 34, 56, 0.08)",
-            border: "1px solid rgba(255, 255, 255, 0.8)",
-            animation: "fadeInUp 0.6s ease forwards",
-          }}
-        >
-          <Box sx={{ mb: 4, textAlign: "center" }}>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: 700,
-                fontSize: { xs: "1.75rem", sm: "2rem" },
-                color: "#1B5E20",
-                mb: 1,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Create Your Account
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: "#424242",
-                fontSize: "0.95rem",
-              }}
-            >
-              Join thousands of researchers worldwide
-            </Typography>
-          </Box>
-
-          <Stepper
-            activeStep={activeStep}
-            alternativeLabel
-            sx={{
-              mb: 4,
-              '& .MuiStepLabel-root .Mui-completed': {
-                color: '#FF6B35',
-              },
-              '& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel': {
-                color: '#FF6B35',
-              },
-              '& .MuiStepLabel-root .Mui-active': {
-                color: '#1B5E20',
-              },
-              '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel': {
-                color: '#1B5E20',
-                fontWeight: 600,
-              },
-            }}
-          >
-            {steps.map((label, index) => (
-              <Step key={label} completed={index < activeStep}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-
-          <form onSubmit={activeStep === steps.length - 1 ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }}>
-            <Box sx={{ mb: 4, minHeight: "400px" }}>
-              {renderStepContent()}
-            </Box>
-
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4, gap: 2 }}>
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
               <MuiButton
-                disabled={activeStep === 0 || loading}
+                disabled={activeStep === 0}
                 onClick={handleBack}
-                sx={{
-                  color: "#424242",
-                  textTransform: "none",
-                  fontWeight: 500,
-                  minWidth: "100px",
-                  '&:hover': {
-                    backgroundColor: "rgba(46, 125, 50, 0.1)",
-                  },
-                  '&:disabled': {
-                    color: "#9E9E9E",
-                  },
-                }}
+                sx={{ color: "#64748B" }}
               >
                 Back
               </MuiButton>
+
               {activeStep === steps.length - 1 ? (
                 <MuiButton
                   type="submit"
                   variant="contained"
                   disabled={loading}
                   sx={{
-                    backgroundColor: "#1B5E20",
-                    color: "#FFFFFF",
-                    padding: "0.875rem 2rem",
-                    borderRadius: "12px",
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    boxShadow: "0 4px 12px rgba(27, 94, 32, 0.3)",
-                    transition: "all 0.3s ease",
-                    '&:hover': {
-                      backgroundColor: "#2E7D32",
-                      boxShadow: "0 6px 20px rgba(27, 94, 32, 0.4)",
-                      transform: "translateY(-1px)",
-                    },
-                    '&:active': {
-                      transform: "translateY(0)",
-                    },
-                    '&:disabled': {
-                      backgroundColor: "#9E9E9E",
-                    },
+                    background: "#FF6B35",
+                    '&:hover': { background: "#E85A2D" },
+                    borderRadius: "8px",
+                    px: 4
                   }}
                 >
-                  {loading ? "Creating Account..." : "Create Account"}
+                  {loading ? "Creating Account..." : "Complete Registration"}
                 </MuiButton>
               ) : (
                 <MuiButton
-                  type="submit"
                   variant="contained"
+                  onClick={handleNext}
                   sx={{
-                    backgroundColor: "#1B5E20",
-                    color: "#FFFFFF",
-                    padding: "0.875rem 2rem",
-                    borderRadius: "12px",
-                    fontSize: "1rem",
-                    fontWeight: 600,
-                    textTransform: "none",
-                    boxShadow: "0 4px 12px rgba(27, 94, 32, 0.3)",
-                    transition: "all 0.3s ease",
-                    '&:hover': {
-                      backgroundColor: "#2E7D32",
-                      boxShadow: "0 6px 20px rgba(27, 94, 32, 0.4)",
-                      transform: "translateY(-1px)",
-                    },
-                    '&:active': {
-                      transform: "translateY(0)",
-                    },
+                    background: "#FF6B35",
+                    '&:hover': { background: "#E85A2D" },
+                    borderRadius: "8px",
+                    px: 4
                   }}
                 >
                   Next
@@ -1243,59 +865,19 @@ const SignUpPage = () => {
             </Box>
           </form>
 
-          <Box sx={{ mt: 4, textAlign: 'center' }}>
-            <Typography variant="body2" sx={{ mb: 2, color: "#424242" }}>
-              Or sign up with
-            </Typography>
-            <MuiButton
-              onClick={handleGoogleSignUp}
-              disabled={loading}
-              variant="outlined"
-              fullWidth
-              sx={{
-                borderColor: "#E0E0E0",
-                color: "#1B5E20",
-                padding: "0.875rem 1.5rem",
-                borderRadius: "12px",
-                fontSize: "1rem",
-                fontWeight: 500,
-                textTransform: "none",
-                backgroundColor: "#FFFFFF",
-                transition: "all 0.3s ease",
-                '&:hover': {
-                  borderColor: "#81C784",
-                  backgroundColor: "#F1F8F4",
-                  boxShadow: "0 2px 8px rgba(46, 125, 50, 0.15)",
-                },
-                '&:disabled': {
-                  borderColor: "#E0E0E0",
-                  color: "#9E9E9E",
-                },
-              }}
-            >
-              <img
-                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                alt=""
-                style={{ height: "20px", width: "20px", marginRight: "12px" }}
-              />
-              Continue with Google
-            </MuiButton>
-          </Box>
-
-          <Box sx={{ mt: 3, textAlign: 'center' }}>
-            <Typography variant="body2" sx={{ color: "#424242" }}>
-              Already have an account? <Link to="/signin" style={{ color: "#FF6B35", fontWeight: 600, textDecoration: "none" }}>Sign In</Link>
+          <Box sx={{ mt: 3, textAlign: "center" }}>
+            <Typography variant="body2" sx={{ color: "#64748B" }}>
+              Already have an account?{" "}
+              <Link to="/signin" style={{ color: "#FF6B35", fontWeight: 600, textDecoration: "none" }}>
+                Sign In
+              </Link>
             </Typography>
           </Box>
         </Paper>
-      </Box>
-
-      <Box sx={{ position: "relative", zIndex: 10, mt: 4 }}>
-        <Footer />
-      </Box>
-    </main>
+      </Container>
+      <Footer />
+    </Box>
   );
 };
 
 export default SignUpPage;
-

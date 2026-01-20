@@ -1,23 +1,9 @@
 // researcherDashboardLogic.js - Backend logic for ResearcherDashboard
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { db, auth } from '../../config/firebaseConfig';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  doc,
-  getDoc,
-  onSnapshot,
-  orderBy,
-  updateDoc,
-  addDoc,
-  serverTimestamp,
-  deleteDoc,
-  writeBatch
-} from 'firebase/firestore';
 import axios from "axios";
+import authService from '../../services/authService';
+import { toast } from 'react-toastify';
 
 export function useResearcherDashboard() {
   // State
@@ -51,50 +37,8 @@ export function useResearcherDashboard() {
   const navigate = useNavigate();
 
   // Effects
-  useEffect(() => {
-    if (!userId) return;
-    const q = query(
-      collection(db, "reviewRequests"),
-      where("researcherId", "==", userId),
-      where("status", "==", "pending")
-    );
-    const unsub = onSnapshot(q, async (snapshot) => {
-      const requests = await Promise.all(snapshot.docs.map(async (docSnap) => {
-        const data = docSnap.data();
-        // Fetch reviewer info
-        let reviewerName = "Unknown Reviewer";
-        let reviewerEmail = "";
-        try {
-          const reviewerDoc = await getDoc(doc(db, "users", data.reviewerId));
-          if (reviewerDoc.exists()) {
-            reviewerName = reviewerDoc.data().name || reviewerName;
-            reviewerEmail = reviewerDoc.data().email || "";
-          }
-        } catch {}
-        // Fetch project info
-        let projectTitle = "Unknown Project";
-        let projectSummary = "";
-        try {
-          const projectDoc = await getDoc(doc(db, "research-listings", data.listingId));
-          if (projectDoc.exists()) {
-            projectTitle = projectDoc.data().title || projectTitle;
-            projectSummary = projectDoc.data().summary || "";
-          }
-        } catch {}
-        return {
-          id: docSnap.id,
-          ...data,
-          reviewerName,
-          reviewerEmail,
-          projectTitle,
-          projectSummary,
-        };
-      }));
-      setReviewRequests(requests);
-    });
-    return () => unsub();
-  }, [userId]);
 
+  // 1. IP Address
   useEffect(() => {
     const fetchIpAddress = async () => {
       try {
@@ -107,114 +51,60 @@ export function useResearcherDashboard() {
     fetchIpAddress();
   }, []);
 
+  // 2. Auth Check & User Profile
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/signin');
-      return;
-    }
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) setUserId(user.uid);
-      else {
-        localStorage.removeItem('authToken');
+    const checkAuth = async () => {
+      const token = authService.getToken();
+      if (!token) {
         navigate('/signin');
+        return;
       }
-    });
-    return () => unsubscribe();
+
+      const user = authService.getCurrentUser();
+      if (user) {
+        setUserId(user.id || 'current-user');
+        setUserName(user.name || user.fullName || 'Researcher');
+
+        // We assume profile exists if user is logged in for now, or check via API
+        setHasProfile(true);
+      } else {
+        // Fallback verification via API
+        try {
+          const profile = await authService.getProfile();
+          if (profile) {
+            setUserId(profile.id);
+            setUserName(profile.full_name || profile.name);
+            setHasProfile(true);
+          }
+        } catch (e) {
+          navigate('/signin');
+        }
+      }
+    };
+
+    checkAuth();
   }, [navigate]);
 
+  // 3. Stubbed Data Fetching (Listings, Messages, etc.)
   useEffect(() => {
     if (!userId) return;
-    const fetchUserProfile = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', userId));
-        if (userDoc.exists()) {
-          setHasProfile(true);
-          setUserName(userDoc.data().name || 'Researcher');
-        } else {
-          navigate('/researcher-edit-profile');
-        }
-      } catch (err) {}
-    };
-    fetchUserProfile();
-  }, [userId, navigate]);
 
-  useEffect(() => {
-    if (!userId) return;
-    const messagesRef = collection(db, 'users', userId, 'messages');
-    const messagesQuery = query(messagesRef, orderBy('timestamp', 'desc'));
-    const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
-      const messagesData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate() || new Date()
-      }));
-      setMessages(messagesData);
-    });
+    // Placeholder: Fetch Listings (Backend not implemented yet)
+    console.log("Fetching listings... (Backend pending)");
+    setAllListings([]);
+    setMyListings([]);
+    setFilteredListings([]);
 
-    const collabQuery = query(
-      collection(db, "collaborations"),
-      where("collaboratorId", "==", userId)
-    );
-    const unsubscribeCollabs = onSnapshot(collabQuery, async (snapshot) => {
-      const collabs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const listings = await Promise.all(
-        collabs.map(async collab => {
-          const listingDoc = await getDoc(doc(db, "research-listings", collab.listingId));
-          return listingDoc.exists() ? { id: listingDoc.id, ...listingDoc.data() } : null;
-        })
-      );
-      setCollabListings(listings.filter(Boolean));
-    });
+    // Placeholder: Fetch Messages
+    console.log("Fetching messages... (Backend pending)");
+    setMessages([]);
 
-    return () => {
-      unsubscribeMessages();
-      unsubscribeCollabs();
-    };
+    // Placeholder: Fetch Requests
+    setReviewRequests([]);
+    setCollabListings([]);
+
   }, [userId]);
 
-  useEffect(() => {
-    if (!userId || !hasProfile) return;
-    const fetchListings = async () => {
-      try {
-        const q = query(collection(db, 'research-listings'));
-        const querySnapshot = await getDocs(q);
-        const data = await Promise.all(
-          querySnapshot.docs.map(async (docSnap) => {
-            const listing = { id: docSnap.id, ...docSnap.data() };
-            try {
-              const researcherDoc = await getDoc(doc(db, 'users', listing.userId));
-              return {
-                ...listing,
-                researcherName: researcherDoc.exists() ? researcherDoc.data().name : 'Unknown Researcher'
-              };
-            } catch {
-              return { ...listing, researcherName: 'Unknown Researcher' };
-            }
-          })
-        );
-        setAllListings(data);
-      } catch (error) {
-        console.error("Error fetching listings:", error);
-      }
-    };
-    fetchListings();
-  }, [userId, hasProfile]);
-
-  useEffect(() => {
-    if (!userId || !hasProfile) return;
-    const fetchMyListings = async () => {
-      try {
-        const q = query(collection(db, 'research-listings'), where('userId', '==', userId));
-        const querySnapshot = await getDocs(q);
-        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setMyListings(data);
-      } catch (error) {
-        console.error("Error fetching user listings:", error);
-      }
-    };
-    fetchMyListings();
-  }, [userId, hasProfile]);
 
   useEffect(() => {
     setFilteredListings(myListings);
@@ -222,17 +112,11 @@ export function useResearcherDashboard() {
 
   // Handlers
   const handleAcceptReviewRequest = async (requestId) => {
-    await updateDoc(doc(db, "reviewRequests", requestId), {
-      status: "accepted",
-      respondedAt: serverTimestamp(),
-    });
+    toast.info("Feature unavailable during system migration.");
   };
 
   const handleDeclineReviewRequest = async (requestId) => {
-    await updateDoc(doc(db, "reviewRequests", requestId), {
-      status: "declined",
-      respondedAt: serverTimestamp(),
-    });
+    toast.info("Feature unavailable during system migration.");
   };
 
   const handleSearch = () => {
@@ -253,41 +137,19 @@ export function useResearcherDashboard() {
   };
 
   const markMessageAsRead = async (messageId) => {
-    try {
-      await updateDoc(doc(db, 'users', userId, 'messages', messageId), {
-        read: true
-      });
-    } catch (error) {
-      console.error("Error marking message as read:", error);
-    }
+    // Stub
   };
 
   const handleMessageClick = (message) => {
-    if (message.type === 'review-request') {
-      if (pendingReviewRef.current) {
-        pendingReviewRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-      setSelectedMessage(null);
-      return;
-    }
-    markMessageAsRead(message.id);
-    if (message.type === 'collaboration-request') {
-      setSelectedMessage(message); // Show Accept/Reject in menu
-      return;
-    }
-    setSelectedMessage(null);
-    switch(message.type) {
-      case 'review-request':
-        navigate(`/review-requests/${message.relatedId}`);
-        break;
-      case 'upload-confirmation':
-        navigate(`/listing/${message.relatedId}`);
-        break;
-      default: break;
-    }
+    // Stub
+    setSelectedMessage(message);
   };
 
-  const handleAddListing = () => navigate('/researcher/add-listing');
+  const handleAddListing = () => {
+    navigate('/researcher/add-listing');
+    // Warning: Add Listing page might also need migration!
+  };
+
   const handleCollaborate = () => navigate('/researcher/collaborate');
 
   const handleInputChange = (e) => {
@@ -295,6 +157,7 @@ export function useResearcherDashboard() {
     setDropdownVisible(false);
     clearTimeout(dropdownTimeout.current);
   };
+
   const handleClear = () => {
     setSearchTerm('');
     setSearchResults([]);
@@ -302,133 +165,36 @@ export function useResearcherDashboard() {
   };
 
   const logEvent = async ({ userId, role, userName, action, details, ip, target }) => {
-    try {
-      await addDoc(collection(db, "logs"), {
-        userId,
-        role,
-        userName,
-        action,
-        details,
-        ip,
-        target,
-        timestamp: serverTimestamp(),
-      });
-    } catch (error) {
-      console.error("Error logging event:", error);
-    }
+    // Stub - logging to firestore removed
+    console.log("Log Event:", { userId, role, userName, action, details });
   };
 
   const handleLogout = async () => {
     try {
-      const user = auth.currentUser;
-      if (user) {
-        await logEvent({
-          userId: user.uid,
-          role: "Researcher",
-          userName: user.displayName || "N/A",
-          action: "Logout",
-          details: "User logged out",
-          ip: ipAddress,
-          target: "Researcher Dashboard", 
-        });
-        await auth.signOut();
-        navigate("/signin");
-      }
+      await authService.logout();
+      navigate("/signin");
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
 
   const handleAcceptCollab = async (message) => {
-    try {
-      await updateDoc(doc(db, 'collaboration-requests', message.id), {
-        status: 'accepted',
-        respondedAt: new Date()
-      });
-      await addDoc(collection(db, 'collaborations'), {
-        listingId: message.relatedId,
-        researcherId: userId,
-        collaboratorId: message.senderId || message.requesterId,
-        joinedAt: new Date(),
-        status: 'active'
-      });
-      setSelectedMessage(null);
-    } catch (error) {
-      console.error('Error accepting collaboration:', error);
-    }
+    toast.info("Collaboration feature currently unavailable.");
   };
+
   const handleRejectCollab = async (message) => {
-    try {
-      await updateDoc(doc(db, 'collaboration-requests', message.id), {
-        status: 'rejected',
-        respondedAt: new Date()
-      });
-      setSelectedMessage(null);
-    } catch (error) {
-      console.error('Error rejecting collaboration:', error);
-    }
+    toast.info("Collaboration feature currently unavailable.");
   };
 
   const handleClearNotifications = async () => {
-    if (!userId) return;
-    try {
-      const messagesRef = collection(db, 'users', userId, 'messages');
-      const messagesSnapshot = await getDocs(messagesRef);
-      const batch = writeBatch(db);
-      let updatedMessages = [];
-      messagesSnapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        if (!data.read) {
-          batch.update(docSnap.ref, { read: true });
-          updatedMessages.push({ ...data, id: docSnap.id, read: true });
-        } else {
-          updatedMessages.push({ ...data, id: docSnap.id });
-        }
-      });
-      await batch.commit();
-      // Update local state immediately for UI responsiveness
-      setMessages(updatedMessages.sort((a, b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0)));
-    } catch (error) {
-      console.error("Error clearing notifications:", error);
-    }
+    setMessages([]);
   };
 
-  const combinedNotifications = [
-    ...messages,
-    ...reviewRequests.map(req => ({
-      id: req.id,
-      type: 'review-request',
-      title: 'Pending Review Request',
-      content: `Reviewer ${req.reviewerName} requested to review your project "${req.projectTitle}".`,
-      timestamp: req.requestedAt?.toDate?.() || new Date(),
-      read: false,
-    }))
-  ];
+  // Combine messages + review requests (stubbed)
+  const combinedNotifications = [];
 
   const handleShowReviewers = async (listingId) => {
-    const q = query(collection(db, "reviewRequests"), where("listingId", "==", listingId));
-    const snap = await getDocs(q);
-    const reviewers = await Promise.all(snap.docs.map(async (docSnap) => {
-      const data = docSnap.data();
-      let reviewerName = "Unknown Reviewer";
-      let reviewerEmail = "";
-      try {
-        const reviewerDoc = await getDoc(doc(db, "users", data.reviewerId));
-        if (reviewerDoc.exists()) {
-          reviewerName = reviewerDoc.data().name || reviewerName;
-          reviewerEmail = reviewerDoc.data().email || "";
-        }
-      } catch {}
-      return {
-        id: docSnap.id,
-        reviewerName,
-        reviewerEmail,
-        status: data.status,
-      };
-    }));
-    setReviewersForProject(reviewers);
-    setShowReviewersDialog(true);
-    setCardMenuAnchor(null);
+    toast.info("Reviewers feature currently unavailable.");
   };
 
   const handleToggleSummary = (id) => {
@@ -445,15 +211,8 @@ export function useResearcherDashboard() {
   };
 
   const handleDeleteListing = async () => {
-    if (!listingToDelete) return;
-    try {
-      await deleteDoc(doc(db, 'research-listings', listingToDelete));
-      setMyListings(prev => prev.filter(l => l.id !== listingToDelete));
-      setDeleteDialogOpen(false);
-      setListingToDelete(null);
-    } catch (error) {
-      console.error("Error deleting listing:", error);
-    }
+    toast.info("Delete feature currently unavailable.");
+    setDeleteDialogOpen(false);
   };
 
   return {

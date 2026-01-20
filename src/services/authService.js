@@ -85,27 +85,7 @@ const authService = {
         }
     },
 
-    // Google authentication
-    googleAuth: async (email, fullName, googleId, photoURL) => {
-        try {
-            const response = await api.post('/auth/google-auth', {
-                email,
-                fullName,
-                googleId,
-                photoURL,
-            });
 
-            if (response.data.success) {
-                // Store token and user info
-                localStorage.setItem('authToken', response.data.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
-            }
-
-            return response.data;
-        } catch (error) {
-            throw error.response?.data || { message: 'Google authentication failed' };
-        }
-    },
 
     // Get user profile
     getProfile: async () => {

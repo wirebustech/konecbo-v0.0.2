@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebaseConfig";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import adminService from "../../services/adminService";
-
 
 const styles = {
   container: {
@@ -12,7 +9,6 @@ const styles = {
     padding: "2rem",
     fontFamily: "Inter, sans-serif",
     color: "#FFFFFF",
-    transition: "background 0.3s",
   },
   dashboard: {
     display: "flex",
@@ -31,27 +27,18 @@ const styles = {
     color: "#B1EDE8",
     fontWeight: "600",
     fontSize: "1.2rem",
-    transition: "transform 0.18s, box-shadow 0.18s",
-    cursor: "default",
-    animation: "fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1)",
     margin: "0.5rem 0",
-  },
-  cardHover: {
-    transform: "translateY(-6px) scale(1.03)",
-    boxShadow: "0 8px 32px 0 rgba(100, 200, 200, 0.18)",
   },
   cardHeader: {
     fontSize: "1.05rem",
     fontWeight: "700",
     color: "#64CCC5",
     marginBottom: "0.4rem",
-    letterSpacing: "0.5px",
   },
   cardValue: {
     fontSize: "2.2rem",
     color: "#fff",
     margin: 0,
-    letterSpacing: "1px",
     fontWeight: "bold",
   },
   chartCard: {
@@ -60,173 +47,37 @@ const styles = {
     padding: "1.5rem",
     minWidth: "350px",
     flex: 1,
-    boxShadow: "0 4px 24px 0 rgba(50, 80, 120, 0.12)",
-    color: "#B1EDE8",
-    fontWeight: "600",
-    fontSize: "1.1rem",
     marginBottom: "2rem",
     maxWidth: "600px",
     height: "320px",
-    animation: "fadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1)",
   },
   chartHeader: {
     marginBottom: "1rem",
     fontSize: "1.15rem",
     color: "#64CCC5",
     fontWeight: "700",
-    letterSpacing: "0.5px",
-  },
-  sourceLabel: {
-    fontSize: "0.75rem",
-    color: "#94A3B8",
-    marginTop: "0.5rem",
-    fontStyle: "italic",
   },
 };
 
-// Add this to the top of your file or in a <style> tag in your component
-const fadeInKeyframes = `
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@media (max-width: 700px) {
-  .dashboard-responsive {
-    flex-direction: column !important;
-    gap: 1rem !important;
-  }
-}
-`;
-
-function useHover() {
-  const [hovered, setHovered] = React.useState(false);
-  const onMouseEnter = () => setHovered(true);
-  const onMouseLeave = () => setHovered(false);
-  return [hovered, { onMouseEnter, onMouseLeave }];
-}
-
-// Dashboard component for admin analytics and stats
 export default function Dashboard() {
-  // State variables for dashboard metrics
   const [totalUsers, setTotalUsers] = useState(0);
   const [sqlUsers, setSqlUsers] = useState(0);
-  const [firebaseUsers, setFirebaseUsers] = useState(0);
-  const [totalLogins, setTotalLogins] = useState(0);
-  const [totalLogouts, setTotalLogouts] = useState(0);
-  const [totalListings, setTotalListings] = useState(0);
-  const [totalReviewerApps, setTotalReviewerApps] = useState(0);
-  const [engagementData, setEngagementData] = useState([]); // Data for engagement chart
   const [loading, setLoading] = useState(true);
-  const [logs, setLogs] = useState([]); // <- Add this line
+  const [logs, setLogs] = useState([]);
 
-  // Fetch all dashboard data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Fetch from SQL database
-        let sqlUserCount = 0;
-        let sqlLogsData = [];
+        // Fetch from SQL database only
         try {
           const sqlStats = await adminService.getDashboardStats();
-          sqlUserCount = sqlStats.stats?.totalUsers || 0;
-          setSqlUsers(sqlUserCount);
-
-          // Fetch SQL activity logs
-          const sqlLogsResponse = await adminService.getActivityLogs({ limit: 1000 });
-          sqlLogsData = sqlLogsResponse.logs || [];
+          const count = sqlStats.stats?.totalUsers || 0;
+          setSqlUsers(count);
+          setTotalUsers(count);
         } catch (sqlError) {
-          console.warn('SQL data fetch failed (may not be available):', sqlError);
+          console.warn('SQL data fetch failed:', sqlError);
         }
-
-        // Fetch logs for login/logout and engagement from Firebase
-        const logsCollection = collection(db, "logs");
-        const logsSnapshot = await getDocs(logsCollection);
-        const firebaseLogsData = logsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Merge logs from both sources
-        const allLogs = [...sqlLogsData, ...firebaseLogsData];
-        setLogs(allLogs);
-
-        // Fetch reviewer applications
-        const reviewersCollection = collection(db, "reviewers");
-        const reviewersSnapshot = await getDocs(reviewersCollection);
-        const reviewers = reviewersSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Fetch all Firebase users
-        const usersCollection = collection(db, "users");
-        const usersSnapshot = await getDocs(usersCollection);
-        const firebaseUsersData = usersSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Fetch research listings
-        const listingsCollection = collection(db, "research-listings");
-        const listingsSnapshot = await getDocs(listingsCollection);
-
-        // Calculate unique Firebase users by email
-        const uniqueFirebaseUsers = new Set(firebaseUsersData.map((user) => user.email)).size;
-        setFirebaseUsers(uniqueFirebaseUsers);
-
-        // Total users = SQL + Firebase (unique)
-        const totalUniqueUsers = sqlUserCount + uniqueFirebaseUsers;
-
-        // Count login and logout actions from all logs
-        const logins = allLogs.filter((log) => log.action === "Login" || log.action === "login").length;
-        const logouts = allLogs.filter((log) => log.action === "Logout" || log.action === "logout").length;
-
-        // Count total listings
-        const listings = listingsSnapshot.size;
-
-        // Count reviewer applications in progress
-        const reviewerApps = reviewers.filter((reviewer) => reviewer.status === "in_progress").length;
-
-        // Update state with calculated metrics
-        setTotalUsers(totalUniqueUsers);
-        setTotalLogins(logins);
-        setTotalLogouts(logouts);
-        setTotalListings(listings);
-        setTotalReviewerApps(reviewerApps);
-
-        // Prepare last 7 days for engagement chart
-        const days = Array.from({ length: 7 }, (_, i) => {
-          const d = new Date();
-          d.setDate(d.getDate() - (6 - i));
-          return d.toISOString().slice(0, 10);
-        });
-
-        // Aggregate logs per day for engagement chart
-        const engagement = days.map((date) => ({
-          date,
-          count: allLogs.filter(
-            (log) => {
-              if (log.timestamp && log.timestamp.toDate) {
-                // Firebase timestamp
-                return log.timestamp.toDate().toISOString().slice(0, 10) === date;
-              } else if (log.created_at) {
-                // SQL timestamp (string)
-                return new Date(log.created_at).toISOString().slice(0, 10) === date;
-              }
-              return false;
-            }
-          ).length,
-        }));
-
-        setEngagementData(engagement);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -237,87 +88,24 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  // Inject keyframes for fade-in animation and responsive
-  React.useEffect(() => {
-    if (!document.getElementById("dashboard-fadein-keyframes")) {
-      const style = document.createElement("style");
-      style.id = "dashboard-fadein-keyframes";
-      style.innerHTML = fadeInKeyframes;
-      document.head.appendChild(style);
-    }
-  }, []);
-
-  // Show loading state while fetching data
   if (loading) {
     return <section style={styles.container}>Loading...</section>;
   }
 
-  // Responsive class for dashboard section
-  const dashboardSectionProps = {
-    style: styles.dashboard,
-    className: "dashboard-responsive",
-  };
-
-  // Helper to render cards with hover effect
-  function Card({ header, value }) {
-    const [hovered, hoverProps] = useHover();
-    return (
-      <article
-        style={{
-          ...styles.card,
-          ...(hovered ? styles.cardHover : {}),
-        }}
-        {...hoverProps}
-      >
-        <div style={styles.cardHeader}>{header}</div>
-        <p style={styles.cardValue}>{value}</p>
-      </article>
-    );
-  }
-
   return (
     <section style={styles.container}>
-      <section {...dashboardSectionProps}>
-        <Card header="Total Users" value={totalUsers} />
-        <Card header="SQL Users" value={sqlUsers} />
-        <Card header="Firebase Users" value={firebaseUsers} />
-        <Card header="Logins" value={totalLogins} />
-        <Card header="Logouts" value={totalLogouts} />
-        <Card header="Listings Posted" value={totalListings} />
-        <Card header="Reviewer Applications" value={totalReviewerApps} />
-      </section>
+      <div style={styles.dashboard}>
+        <article style={styles.card}>
+          <div style={styles.cardHeader}>Total Users</div>
+          <p style={styles.cardValue}>{totalUsers}</p>
+        </article>
+      </div>
 
-      {/* Engagement line chart for logs per day */}
       <section style={styles.chartCard}>
         <header style={styles.chartHeader}>Engagement (Logs per Day)</header>
-        {logs && logs.length === 0 && (
-          <div style={{ textAlign: "center", marginTop: "1rem", color: "#b1ede8" }}>
-            No logs found
-          </div>
-        )}
-        {logs && logs.length > 0 && (
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={engagementData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#364E68" />
-              <XAxis dataKey="date" stroke="#B1EDE8" fontSize={12} />
-              <YAxis allowDecimals={false} stroke="#B1EDE8" fontSize={12} />
-              <Tooltip
-                contentStyle={{ background: "#2B3E50", border: "none", color: "#B1EDE8" }}
-                labelStyle={{ color: "#64CCC5" }}
-                formatter={(value) => [value, "Logs"]}
-                labelFormatter={(label) => `Date: ${label}`}
-              />
-              <Line
-                type="monotone"
-                dataKey="count"
-                stroke="#64CCC5"
-                strokeWidth={3}
-                dot={{ r: 5, stroke: "#2B3E50", strokeWidth: 2, fill: "#64CCC5" }}
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
+        <div style={{ textAlign: "center", marginTop: "1rem", color: "#b1ede8" }}>
+          Chart unavailable (Maintenance)
+        </div>
       </section>
     </section>
   );

@@ -3,6 +3,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import SignInPageHybrid from "./pages/SignInPageHybrid";
+import SignUpPage from "./pages/SignUpPage";
 import SignUpPageSimple from "./pages/SignUpPageSimple";
 import LandingPage from "./pages/LandingPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -35,10 +36,6 @@ import CollaborationDashboard from "./pages/Researcher/CollaborationDashboard";
 import FriendProfile from "./components/FriendProfile";
 
 
-import { auth, db } from "./config/firebaseConfig";
-import { useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { logEvent } from "./utils/logEvent";
 import axios from "axios";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -60,26 +57,6 @@ function App() {
     }
   };
   const location = useLocation();
-  // Log login events to Firestore on auth state change
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        const userName = userDoc.exists() ? userDoc.data().name : "N/A";
-        const userRole = userDoc.exists() ? userDoc.data().role : "unknown";
-        const ip = await fetchIpAddress();
-        await logEvent({
-          userId: user.uid,
-          role: userRole,
-          userName,
-          action: "Login",
-          details: "User logged in",
-          ip,
-        });
-      }
-    });
-    return () => unsubscribe();
-  }, []);
 
   return (
     <>
@@ -92,7 +69,8 @@ function App() {
         {/* Public routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/signin" element={<SignInPageHybrid />} />
-        <Route path="/signup" element={<SignUpPageSimple />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/signup-simple" element={<SignUpPageSimple />} />
         <Route path="/learn-more" element={<LearnMore />} />
         <Route path="/friend-profile/:userId" element={<FriendProfile />} />
         {/* Admin routes */}
