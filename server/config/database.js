@@ -3,9 +3,9 @@ require('dotenv').config();
 
 // Azure Database uses SSL by default. We must enable it.
 const pool = new Pool({
-    host: process.env.DB_HOST || 'konecbo-db.postgres.database.azure.com',
+    host: process.env.DB_HOST || 'konecbo-webs2.postgres.database.azure.com',
     port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'konecbo',
+    database: process.env.DB_NAME || 'postgres',
     user: process.env.DB_USER || 'konecboadmin',
     password: process.env.DB_PASSWORD, // Must be supplied via Environment Variables
     ssl: {

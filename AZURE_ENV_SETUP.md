@@ -237,6 +237,15 @@ Before clicking "Save", verify:
 
 - [ ] DATABASE_URL includes `?sslmode=require` at the end
 - [ ] JWT_SECRET is at least 32 characters long
+### Error: "getaddrinfo ENOTFOUND"
+**Reason:** The application cannot find your database server.
+**Fix:**
+1. Go to **Azure Portal** -> **Your Web App** -> **Configuration**.
+2. Find the `DB_HOST` (or `DATABASE_URL`) setting.
+3. **Current Status**: It is using the default placeholder `konecbo-db.postgres.database.azure.com`.
+4. **Action**: Update the value to your **ACTUAL** PostgreSQL server hostname.
+   - Example: `my-real-db-server.postgres.database.azure.com`
+5. Save and Restart.
 - [ ] NODE_ENV is exactly `production` (lowercase)
 - [ ] CLIENT_URL starts with `https://`
 - [ ] CLIENT_URL matches your actual Azure app name
