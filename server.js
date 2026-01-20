@@ -66,8 +66,8 @@ app.get('/api/debug-files', (req, res) => {
     });
 });
 
-// API 404 Handler - If a request starts with /api/ but matches no route, return JSON 404
-app.use('/api/*', (req, res) => {
+// API 404 Handler - If a request starts with /api but matches no route, return JSON 404
+app.use('/api', (req, res) => {
     res.status(404).json({
         success: false,
         message: 'API route not found'
