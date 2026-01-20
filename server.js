@@ -40,6 +40,23 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// DEBUG ENDPOINT - Remove in production
+const fs = require('fs');
+app.get('/api/debug-files', (req, res) => {
+    const rootFiles = fs.readdirSync(__dirname);
+    let buildFiles = [];
+    try {
+        buildFiles = fs.readdirSync(path.join(__dirname, 'build'));
+    } catch (e) {
+        buildFiles = ['Error reading build dir: ' + e.message];
+    }
+    res.json({
+        root: __dirname,
+        files: rootFiles,
+        buildFiles: buildFiles
+    });
+});
+
 // API 404 Handler - If a request starts with /api/ but matches no route, return JSON 404
 app.use('/api/*', (req, res) => {
     res.status(404).json({
