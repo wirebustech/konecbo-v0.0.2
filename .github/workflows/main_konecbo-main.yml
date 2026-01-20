@@ -28,6 +28,8 @@ jobs:
           node-version: '20.x'
 
       - name: npm install, build, and prepare artifact
+        env:
+          REACT_APP_API_URL: https://konecbo-main.azurewebsites.net/api
         run: |
           npm ci
           npm run build
@@ -37,6 +39,7 @@ jobs:
           
           # Copy essential files
           cp -r build deployment_artifact/
+          cp -r server deployment_artifact/
           cp server.js deployment_artifact/
           cp package.json deployment_artifact/
           cp package-lock.json deployment_artifact/
