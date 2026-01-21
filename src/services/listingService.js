@@ -62,6 +62,16 @@ const listingService = {
         }
     },
 
+    // Update listing
+    updateListing: async (id, listingData) => {
+        try {
+            const response = await api.put(`/listings/${id}`, listingData);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Network error' };
+        }
+    },
+
     // Delete listing
     deleteListing: async (id) => {
         try {

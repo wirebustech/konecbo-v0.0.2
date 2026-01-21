@@ -84,6 +84,51 @@ exports.getListingById = async (req, res) => {
     }
 };
 
+// Update listing
+exports.updateListing = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const researcher_id = req.user.id;
+        const { title, summary, description, category, budget, deadline, status } = req.body;
+
+        // Check ownership
+        const checkQuery = 'SELECT researcher_id FROM listings WHERE id = $1';
+        const checkResult = await pool.query(checkQuery, [id]);
+
+        if (checkResult.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Listing not found' });
+        }
+
+        if (checkResult.rows[0].researcher_id !== researcher_id) {
+            return res.status(403).json({ success: false, message: 'Not authorized to update this listing' });
+        }
+
+        const updateQuery = `
+            UPDATE listings 
+            SET title = $1, summary = $2, description = $3, category = $4, budget = $5, deadline = $6, status = $7, updated_at = CURRENT_TIMESTAMP
+            WHERE id = $8
+            RETURNING *
+        `;
+        const values = [
+            title,
+            summary,
+            description,
+            category,
+            budget,
+            deadline,
+            status || 'active',
+            id
+        ];
+
+        const result = await pool.query(updateQuery, values);
+        res.json({ success: true, listing: result.rows[0] });
+
+    } catch (error) {
+        console.error('Update listing error:', error);
+        res.status(500).json({ success: false, message: 'Server error updating listing' });
+    }
+};
+
 // Delete listing
 exports.deleteListing = async (req, res) => {
     try {

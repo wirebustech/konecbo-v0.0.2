@@ -29,6 +29,7 @@ import ResearcherDashboard from "./pages/Researcher/ResearcherDashboard";
 import ResearcherProfile from "./pages/Researcher/ResearcherProfile";
 import EditProfile from "./pages/Researcher/EditProfile";
 import AddListing from "./pages/Researcher/AddListing";
+import EditListing from "./pages/Researcher/EditListing";
 import CollaboratePage from "./pages/Researcher/CollaboratePage";
 import ChatRoom from "./pages/Researcher/ChatRoom";
 import FriendsSystem from './components/FriendsSystem';
@@ -157,6 +158,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AddListing />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/researcher/edit-listing/:id"
+          element={
+            <ProtectedRoute>
+              <EditListing />
             </ProtectedRoute>
           }
         />

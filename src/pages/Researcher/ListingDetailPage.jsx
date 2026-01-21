@@ -152,7 +152,7 @@ const ListingDetailPage = () => {
                       variant="outlined"
                       color="primary"
                       fullWidth
-                    // onClick={() => navigate(`/researcher/edit-listing/${id}`)}
+                      onClick={() => navigate(`/researcher/edit-listing/${id}`)}
                     >
                       Edit Listing
                     </Button>
