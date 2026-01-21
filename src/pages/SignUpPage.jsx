@@ -8,10 +8,9 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PublicIcon from '@mui/icons-material/Public';
 import SchoolIcon from '@mui/icons-material/School';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import './TermsAndConditions.css';
 import Footer from "../components/Footer";
-import Navbar from "../components/Navbar";
-import "../pages/Researcher/ResearcherDashboard.css";
 import authService from "../services/authService";
 import {
   Typography,
@@ -23,8 +22,7 @@ import {
   IconButton,
   Container,
   Checkbox,
-  FormControlLabel,
-  Link as MuiLink
+  FormControlLabel
 } from "@mui/material";
 
 const SignUpPage = () => {
@@ -92,9 +90,6 @@ const SignUpPage = () => {
       );
 
       toast.success("Account created successfully!");
-      // Redirect to signin or dashboard (if auto-login implemented)
-      // Usually register returns token, authService stores it.
-      // So we can go to dashboard.
       navigate('/researcher-dashboard');
 
     } catch (error) {
@@ -105,14 +100,106 @@ const SignUpPage = () => {
     }
   };
 
+  // Common input styles for green theme
+  const inputSx = {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: "12px",
+      backgroundColor: "#F8FAFC",
+      transition: "all 0.2s ease",
+      '&:hover': {
+        backgroundColor: "#F1F5F9",
+      },
+      '&.Mui-focused': {
+        backgroundColor: "#FFFFFF",
+        boxShadow: "0 0 0 3px rgba(16, 185, 129, 0.1)",
+      },
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: "#10b981",
+    },
+  };
+
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "#f8fafc" }}>
-      <Navbar />
-      <Container maxWidth="sm" sx={{ flex: 1, display: "flex", alignItems: "center", py: 4 }}>
-        <Paper elevation={0} sx={{ p: 4, width: "100%", borderRadius: 4, bgcolor: "white", boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+    <Box sx={{ minHeight: "100vh", background: "#e6f4ff", position: "relative", overflow: "hidden", display: 'flex', flexDirection: 'column' }}>
+
+      {/* Header Buttons */}
+      <Box
+        sx={{
+          position: "relative",
+          zIndex: 10,
+          padding: { xs: "1rem", sm: "1.5rem" },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <MuiButton
+          onClick={() => navigate(-1)}
+          sx={{
+            color: "#1E293B",
+            minWidth: 0,
+            p: { xs: 1, sm: 1.5 },
+            borderRadius: "12px",
+            background: "#FFFFFF",
+            border: "1px solid #CBD5E1",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            transition: "all 0.3s ease",
+            '&:hover': {
+              background: "#F8FAFC",
+              transform: "translateX(-2px)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            },
+          }}
+        >
+          <ArrowBackIosIcon sx={{ fontSize: { xs: "1rem", sm: "1.2rem" } }} />
+        </MuiButton>
+
+        <MuiButton
+          onClick={() => navigate("/")}
+          sx={{
+            color: "#1E293B",
+            px: { xs: 2, sm: 2.5 },
+            py: 1,
+            borderRadius: "12px",
+            background: "#FFFFFF",
+            border: "1px solid #CBD5E1",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            fontWeight: 600,
+            fontSize: { xs: "0.875rem", sm: "0.95rem" },
+            textTransform: "none",
+            transition: "all 0.3s ease",
+            '&:hover': {
+              background: "#F8FAFC",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+            },
+          }}
+        >
+          Home
+        </MuiButton>
+      </Box>
+
+      <Container maxWidth="md" sx={{ flex: 1, display: "flex", alignItems: "center", py: 4, position: 'relative', zIndex: 10 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, md: 5 },
+            width: "100%",
+            background: "rgba(255, 255, 255, 0.98)",
+            backdropFilter: "blur(20px)",
+            borderRadius: "24px",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.9)",
+          }}
+        >
 
           <Box sx={{ mb: 4, textAlign: "center" }}>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: "#1e293b", mb: 1 }}>
+            <Typography variant="h4" sx={{
+              fontWeight: 800,
+              mb: 1,
+              background: "linear-gradient(135deg, #059669 0%, #10b981 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>
               Join Konecbo
             </Typography>
             <Typography variant="body1" sx={{ color: "#64748b" }}>
@@ -130,6 +217,7 @@ const SignUpPage = () => {
                 onChange={handleInputChange}
                 required
                 fullWidth
+                sx={inputSx}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -147,6 +235,7 @@ const SignUpPage = () => {
                 onChange={handleInputChange}
                 required
                 fullWidth
+                sx={inputSx}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -156,7 +245,7 @@ const SignUpPage = () => {
                 }}
               />
 
-              <Box sx={{ display: "flex", gap: 2 }}>
+              <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
                 <TextField
                   label="Country of Residence"
                   name="country"
@@ -164,6 +253,7 @@ const SignUpPage = () => {
                   onChange={handleInputChange}
                   required
                   fullWidth
+                  sx={inputSx}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -179,6 +269,7 @@ const SignUpPage = () => {
                   onChange={handleInputChange}
                   required
                   fullWidth
+                  sx={inputSx}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -196,6 +287,7 @@ const SignUpPage = () => {
                 onChange={handleInputChange}
                 required
                 fullWidth
+                sx={inputSx}
                 placeholder="e.g. AI, Climate Change, Data Science"
                 InputProps={{
                   startAdornment: (
@@ -207,7 +299,7 @@ const SignUpPage = () => {
                 helperText="Separate multiple interests with commas"
               />
 
-              <Box sx={{ display: "flex", gap: 2 }}>
+              <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
                 <TextField
                   label="Password"
                   name="password"
@@ -216,6 +308,7 @@ const SignUpPage = () => {
                   onChange={handleInputChange}
                   required
                   fullWidth
+                  sx={inputSx}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -234,6 +327,7 @@ const SignUpPage = () => {
                   onChange={handleInputChange}
                   required
                   fullWidth
+                  sx={inputSx}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -252,12 +346,12 @@ const SignUpPage = () => {
                     checked={formData.agreeToTerms}
                     onChange={handleInputChange}
                     name="agreeToTerms"
-                    color="primary"
+                    sx={{ color: '#10b981', '&.Mui-checked': { color: '#059669' } }}
                   />
                 }
                 label={
                   <Typography variant="body2" sx={{ color: "#64748b" }}>
-                    I agree to the <Link to="/terms" style={{ color: "#0f172a", fontWeight: 600 }}>Terms and Conditions</Link>
+                    I agree to the <Link to="/terms" style={{ color: "#059669", fontWeight: 600 }}>Terms and Conditions</Link>
                   </Typography>
                 }
               />
@@ -268,13 +362,20 @@ const SignUpPage = () => {
                 disabled={loading}
                 size="large"
                 sx={{
-                  bgcolor: "#0f172a",
-                  color: "white",
-                  py: 1.5,
-                  fontSize: "1rem",
+                  background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                  color: "#FFFFFF",
+                  padding: { xs: "0.875rem", sm: "1rem" },
+                  borderRadius: "12px",
+                  fontSize: { xs: "0.95rem", sm: "1rem" },
+                  fontWeight: 700,
                   textTransform: "none",
-                  borderRadius: 2,
-                  '&:hover': { bgcolor: "#334155" }
+                  boxShadow: "0 8px 20px rgba(16, 185, 129, 0.3)",
+                  transition: "all 0.3s ease",
+                  '&:hover': {
+                    background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                    boxShadow: "0 12px 28px rgba(16, 185, 129, 0.4)",
+                    transform: "translateY(-2px)",
+                  },
                 }}
               >
                 {loading ? "Creating Account..." : "Sign Up"}
@@ -282,7 +383,7 @@ const SignUpPage = () => {
 
               <Typography variant="body2" align="center" sx={{ color: "#64748b", mt: 2 }}>
                 Already have an account?{" "}
-                <Link to="/signin" style={{ color: "#0f172a", fontWeight: 600, textDecoration: "none" }}>
+                <Link to="/signin" style={{ color: "#059669", fontWeight: 600, textDecoration: "none" }}>
                   Sign In
                 </Link>
               </Typography>
