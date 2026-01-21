@@ -9,6 +9,7 @@ require('dotenv').config();
 // So routes are at ./server/routes/
 const authRoutes = require('./server/routes/authRoutes');
 const adminRoutes = require('./server/routes/adminRoutes');
+const listingRoutes = require('./server/routes/listingRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/listings', listingRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import authService from '../../services/authService';
+import listingService from '../../services/listingService';
 import { toast } from 'react-toastify';
 
 export function useResearcherDashboard() {
@@ -85,22 +86,29 @@ export function useResearcherDashboard() {
     checkAuth();
   }, [navigate]);
 
-  // 3. Stubbed Data Fetching (Listings, Messages, etc.)
+  // 3. Fetch Data
   useEffect(() => {
     if (!userId) return;
 
-    // Placeholder: Fetch Listings (Backend not implemented yet)
-    console.log("Fetching listings... (Backend pending)");
-    setAllListings([]);
-    setMyListings([]);
-    setFilteredListings([]);
+    const fetchData = async () => {
+      try {
+        console.log("Fetching listings...");
+        const allResponse = await listingService.getAllListings();
+        setAllListings(allResponse.listings || []);
+
+        const myResponse = await listingService.getMyListings();
+        setMyListings(myResponse.listings || []);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        // toast.error("Could not load listings"); // Optional: don't spam if backend is offline
+      }
+    };
+    fetchData();
 
     // Placeholder: Fetch Messages
-    console.log("Fetching messages... (Backend pending)");
     setMessages([]);
-
-    // Placeholder: Fetch Requests
     setReviewRequests([]);
+    // Collab listings logic to be implemented
     setCollabListings([]);
 
   }, [userId]);
@@ -211,8 +219,19 @@ export function useResearcherDashboard() {
   };
 
   const handleDeleteListing = async () => {
-    toast.info("Delete feature currently unavailable.");
-    setDeleteDialogOpen(false);
+    if (!listingToDelete) return;
+    try {
+      await listingService.deleteListing(listingToDelete);
+      toast.success("Listing deleted successfully");
+      setMyListings(prev => prev.filter(item => item.id !== listingToDelete));
+      setAllListings(prev => prev.filter(item => item.id !== listingToDelete));
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error(error.message || "Failed to delete listing");
+    } finally {
+      setDeleteDialogOpen(false);
+      setListingToDelete(null);
+    }
   };
 
   return {

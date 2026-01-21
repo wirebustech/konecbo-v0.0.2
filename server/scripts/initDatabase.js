@@ -96,6 +96,24 @@ const createTables = async () => {
         END IF;
       END $$;
     `);
+
+    // Listings table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS listings (
+        id SERIAL PRIMARY KEY,
+        researcher_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        summary TEXT NOT NULL,
+        description TEXT,
+        category VARCHAR(100),
+        budget VARCHAR(100),
+        deadline DATE,
+        status VARCHAR(50) DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_listings_researcher_id ON listings(researcher_id);
+    `);
     // Activity logs table
     await client.query(`
       CREATE TABLE IF NOT EXISTS activity_logs (
@@ -166,6 +184,14 @@ const createTables = async () => {
       DROP TRIGGER IF EXISTS update_user_profiles_updated_at ON user_profiles;
       CREATE TRIGGER update_user_profiles_updated_at
         BEFORE UPDATE ON user_profiles
+        FOR EACH ROW
+        EXECUTE FUNCTION update_updated_at_column();
+    `);
+
+    await client.query(`
+      DROP TRIGGER IF EXISTS update_listings_updated_at ON listings;
+      CREATE TRIGGER update_listings_updated_at
+        BEFORE UPDATE ON listings
         FOR EACH ROW
         EXECUTE FUNCTION update_updated_at_column();
     `);
