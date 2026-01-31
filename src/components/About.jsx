@@ -20,8 +20,8 @@ const About = () => {
     <section className="home-container">
       <Navbar />
       {showBackButton && (
-        <button 
-          onClick={() => navigate(-1)} 
+        <button
+          onClick={() => navigate(-1)}
           style={{
             position: "absolute",
             top: "6rem",
@@ -43,7 +43,7 @@ const About = () => {
       )}
 
       {/* Hero Section - Matching Home Page Style */}
-      <section className="home-banner-container" style={{ paddingTop: "2rem", marginBottom: "3rem", marginLeft: "5rem" }}>
+      <section className="home-banner-container" style={{ paddingTop: "2rem", marginBottom: "3rem" }}>
         <article className="home-text-section">
           <header>
             <p style={{ fontSize: "1rem", color: "#FF6B35", fontWeight: 600, marginBottom: "0.5rem" }}>
@@ -69,7 +69,7 @@ const About = () => {
           <img src={AboutBackgroundImage} alt="Collaboration in Action" />
         </figure>
       </section>
-      
+
       {/* Content Sections - Matching Home Page Style */}
       <section className="platform-overview" style={{ padding: "4rem 2rem", backgroundColor: "#F1F8F4" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
@@ -164,7 +164,7 @@ const About = () => {
           </section>
         </div>
       </section>
-      
+
       <Footer />
     </section>
   );
