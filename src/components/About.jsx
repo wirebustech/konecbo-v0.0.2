@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../pages/LandingPage.css";
-import AboutBackgroundImage from "../assets/about-background-matched.png";
+import AboutBackgroundImage from "../assets/about-background-final.png";
 import { Link } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi";
 import Navbar from "./Navbar";
@@ -45,7 +45,7 @@ const About = () => {
         )}
 
         {/* Hero Section - Matching Home Page Style */}
-        <section className="home-banner-container" style={{ paddingTop: "2rem", marginBottom: "3rem" }}>
+        <section className="home-banner-container" style={{ paddingTop: "2rem", marginBottom: "3rem", backgroundColor: "#ffffff" }}>
           <article className="home-text-section">
             <header>
               <p style={{ fontSize: "1rem", color: "#FF6B35", fontWeight: 600, marginBottom: "0.5rem" }}>
