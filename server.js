@@ -78,15 +78,19 @@ const startServer = async () => {
         console.log('🔄 Initializing database...');
         await createTables();
         console.log('✅ Database initialized successfully');
+    } catch (error) {
+        console.error('❌ Failed to initialize database (proceeding anyway):', error.message);
+        // Do not exit, allow server to start for static files
+    }
 
+    try {
         app.listen(PORT, () => {
             console.log(`🚀 Konecbo API v0.0.3 (Fixed Build) running on port ${PORT}`);
             console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
             console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'Default (localhost & Azure Domain)'}`);
         });
-    } catch (error) {
-        console.error('❌ Failed to start server:', error);
-        process.exit(1);
+    } catch (err) {
+        console.error('❌ Failed to start server port listener:', err);
     }
 };
 
