@@ -65,7 +65,7 @@ const About = () => {
             </Link>
           </nav>
         </article>
-        <figure className="home-image-section">
+        <figure className="home-image-section" style={{ marginLeft: "2rem" }}>
           <img src={AboutBackgroundImage} alt="Collaboration in Action" />
         </figure>
       </section>
