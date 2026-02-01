@@ -45,31 +45,88 @@ const About = () => {
         )}
 
         {/* Hero Section - Matching Home Page Style */}
-        <section className="home-banner-container" style={{ paddingTop: "2rem", marginBottom: "3rem", backgroundColor: "#f6f6f6" }}>
-          <article className="home-text-section">
-            <header>
-              <p style={{ fontSize: "1rem", color: "#FF6B35", fontWeight: 600, marginBottom: "0.5rem" }}>
-                About Konecbo
+        {/* Hero Section - Modernized with better spacing */}
+        <section style={{
+          backgroundColor: "#f6f6f6",
+          padding: "5rem 0",
+          display: "flex",
+          justifyContent: "center"
+        }}>
+          <div style={{
+            maxWidth: "1200px",
+            width: "100%",
+            padding: "0 2rem",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "4rem",
+            flexWrap: "wrap"
+          }}>
+            <article style={{ flex: "1 1 500px", minWidth: "300px" }}>
+              <header>
+                <p style={{
+                  fontSize: "1rem",
+                  color: "#FF6B35",
+                  fontWeight: 700,
+                  letterSpacing: "1px",
+                  textTransform: "uppercase",
+                  marginBottom: "1rem"
+                }}>
+                  About Konecbo
+                </p>
+                <h1 style={{
+                  fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
+                  color: "#1B5E20",
+                  lineHeight: "1.2",
+                  fontWeight: 800,
+                  marginBottom: "1.5rem"
+                }}>
+                  Our Story
+                </h1>
+              </header>
+              <p style={{
+                fontSize: "1.125rem",
+                color: "#4a4a4a",
+                lineHeight: "1.7",
+                marginBottom: "1.5rem"
+              }}>
+                Konecbo was born from a simple observation: groundbreaking research often requires diverse expertise, yet researchers struggle to find the right collaborators beyond their immediate networks. In today's interconnected world, geographical boundaries shouldn't limit scientific progress.
               </p>
-              <h1 className="primary-heading">
-                Our Story
-              </h1>
-            </header>
-            <p className="primary-text">
-              Konecbo was born from a simple observation: groundbreaking research often requires diverse expertise, yet researchers struggle to find the right collaborators beyond their immediate networks. In today's interconnected world, geographical boundaries shouldn't limit scientific progress.
-            </p>
-            <p className="primary-text" style={{ marginTop: "1rem" }}>
-              Founded in 2024 by a team of researchers and technologists who experienced these challenges firsthand, Konecbo was created to break down the barriers that separate brilliant minds working on similar problems across continents.
-            </p>
-            <nav style={{ marginTop: "2rem" }}>
-              <Link to="/learn-more" className="secondary-button">
-                Learn More <FiArrowRight />
-              </Link>
-            </nav>
-          </article>
-          <figure className="home-image-section" style={{ marginLeft: "2rem" }}>
-            <img src={AboutBackgroundImage} alt="Collaboration in Action" />
-          </figure>
+              <p style={{
+                fontSize: "1.125rem",
+                color: "#4a4a4a",
+                lineHeight: "1.7",
+                marginBottom: "2.5rem"
+              }}>
+                Founded in 2025 by a team of researchers and technologists who experienced these challenges firsthand, Konecbo was created to break down the barriers that separate brilliant minds working on similar problems across continents.
+              </p>
+              <nav>
+                <Link to="/learn-more" className="secondary-button" style={{ display: "inline-flex", alignItems: "center" }}>
+                  Learn More <FiArrowRight style={{ marginLeft: "0.5rem" }} />
+                </Link>
+              </nav>
+            </article>
+            <figure style={{
+              flex: "1 1 400px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              margin: 0
+            }}>
+              <img
+                src={AboutBackgroundImage}
+                alt="Collaboration in Action"
+                style={{
+                  width: "100%",
+                  maxWidth: "500px",
+                  height: "auto",
+                  objectFit: "contain",
+                  filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.05))"
+                }}
+              />
+            </figure>
+          </div>
         </section>
 
         {/* Content Sections - Matching Home Page Style */}
