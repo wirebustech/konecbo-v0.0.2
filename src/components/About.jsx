@@ -45,7 +45,7 @@ const About = () => {
         )}
 
         {/* Hero Section - Matching Home Page Style */}
-        <section className="home-banner-container" style={{ paddingTop: "2rem", marginBottom: "3rem", backgroundColor: "#ffffff" }}>
+        <section className="home-banner-container" style={{ paddingTop: "2rem", marginBottom: "3rem", backgroundColor: "#f6f6f6" }}>
           <article className="home-text-section">
             <header>
               <p style={{ fontSize: "1rem", color: "#FF6B35", fontWeight: 600, marginBottom: "0.5rem" }}>
