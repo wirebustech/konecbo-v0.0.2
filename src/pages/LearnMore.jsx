@@ -98,8 +98,10 @@ const LearnMore = () => {
                 maxWidth: "500px",
                 height: "auto",
                 objectFit: "contain",
-                filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.1))",
-                borderRadius: "12px"
+                borderRadius: "12px",
+                // Fade effect for borders
+                maskImage: "radial-gradient(ellipse at center, black 60%, transparent 100%)",
+                WebkitMaskImage: "radial-gradient(ellipse at center, black 60%, transparent 100%)"
               }}
             />
           </figure>
