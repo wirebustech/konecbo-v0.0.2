@@ -1,8 +1,9 @@
-import './TermsAndConditions.css'; 
+import './TermsAndConditions.css';
 import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import LearnMoreImage from "../assets/learn-more.png";
 
 
 const LearnMore = () => {
@@ -11,8 +12,8 @@ const LearnMore = () => {
   return (
     <section className="home-container">
       <Navbar />
-      <button 
-        onClick={() => navigate(-1)} 
+      <button
+        onClick={() => navigate(-1)}
         style={{
           position: "absolute",
           top: "6rem",
@@ -30,37 +31,79 @@ const LearnMore = () => {
         }}
       >
         <ArrowBackIosIcon style={{ fontSize: "1rem", verticalAlign: "middle" }} /> Back
-        </button>
+      </button>
 
-      {/* Hero Section */}
-      <section className="home-banner-container" style={{ paddingTop: "4rem", marginBottom: "3rem", marginLeft: "5rem" }}>
-        <article className="home-text-section" style={{ flex: "1.5" }}>
-          <header>
-            <p style={{ fontSize: "1rem", color: "#FF6B35", fontWeight: 600, marginBottom: "0.5rem" }}>
-              Learn More
+      {/* Hero Section - Modernized Layout */}
+      <section style={{
+        backgroundColor: "#f9f9f9",
+        padding: "5rem 2rem",
+        display: "flex",
+        justifyContent: "center",
+        overflow: "hidden"
+      }}>
+        <div style={{
+          maxWidth: "1200px",
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "4rem",
+          flexWrap: "wrap"
+        }}>
+          <article style={{ flex: "1 1 500px", minWidth: "300px" }}>
+            <header>
+              <p style={{
+                fontSize: "1rem",
+                color: "#FF6B35",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+                marginBottom: "1rem"
+              }}>
+                Learn More
+              </p>
+              <h1 style={{
+                fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
+                color: "#1B5E20",
+                lineHeight: "1.2",
+                fontWeight: 800,
+                marginBottom: "1.5rem"
+              }}>
+                Deep Dive into Konecbo
+              </h1>
+            </header>
+            <p style={{
+              fontSize: "1.125rem",
+              color: "#4a4a4a",
+              lineHeight: "1.7",
+              marginBottom: "1.5rem"
+            }}>
+              Discover how Konecbo empowers researchers to connect, collaborate, and accelerate scientific discovery. Whether you're seeking collaborators or looking to join exciting research projects, this guide will help you make the most of our platform.
             </p>
-            <h1 className="primary-heading">
-              Deep Dive into Konecbo
-            </h1>
-          </header>
-          <p className="primary-text">
-            Discover how Konecbo empowers researchers to connect, collaborate, and accelerate scientific discovery. Whether you're seeking collaborators or looking to join exciting research projects, this guide will help you make the most of our platform.
-          </p>
-        </article>
-        <figure className="home-image-section" style={{ flex: "1" }}>
-          <div style={{ 
-            width: "90%", 
-            height: "300px", 
-            backgroundColor: "#F1F8F4", 
-            borderRadius: "12px",
+          </article>
+          <figure style={{
+            flex: "1 1 400px",
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
-            border: "2px solid rgba(46, 125, 50, 0.2)"
+            alignItems: "center",
+            margin: 0,
+            position: "relative"
           }}>
-            <span style={{ fontSize: "3rem", color: "#1B5E20" }}>📚</span>
-          </div>
-        </figure>
+            <img
+              src={LearnMoreImage}
+              alt="Deep Dive into Konecbo"
+              style={{
+                width: "100%",
+                maxWidth: "500px",
+                height: "auto",
+                objectFit: "contain",
+                filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.1))",
+                borderRadius: "12px"
+              }}
+            />
+          </figure>
+        </div>
       </section>
 
       {/* Content Sections */}
@@ -240,7 +283,7 @@ const LearnMore = () => {
           </section>
         </div>
       </section>
-      
+
       <Footer />
     </section>
   );
