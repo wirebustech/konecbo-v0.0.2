@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import LearnMoreImage from "../assets/learn-more-transparent.png";
+import LearnMoreImage from "../assets/learn-more-matched.png";
 
 
 const LearnMore = () => {
