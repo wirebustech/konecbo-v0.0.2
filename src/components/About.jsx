@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "../pages/LandingPage.css";
-import AboutBackgroundImage from "../assets/about-background-final.png";
+import AboutBackgroundImage from "../assets/about-background-matched.png";
 import { Link } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi";
 import Navbar from "./Navbar";
