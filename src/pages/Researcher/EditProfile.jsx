@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import './ResearcherDashboard.css';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import MenuIcon from '@mui/icons-material/Menu';
-import Footer from '../../components/Footer';
 import {
   Box, Button, IconButton, Menu, MenuItem, Typography,
   TextField, Select, InputLabel, FormControl, Avatar,
@@ -452,7 +451,6 @@ const EditProfile = () => {
         </Box>
       </Container>
 
-      <Footer />
     </Box>
   );
 };

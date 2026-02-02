@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ResearcherDashboard.css';
 import axios from "axios";
-import Footer from '../../components/Footer';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useResearcherDashboard } from './researcherDashboardLogic';
 // MUI Components
@@ -841,9 +840,6 @@ const ResearcherDashboard = () => {
         </Dialog>
       </section>
 
-      <footer>
-        <Footer />
-      </footer>
       <FloatingHelpChat chatId={`support_${userId}`} title="Contact Admin Support" />
     </main>
   );
