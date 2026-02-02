@@ -3,6 +3,7 @@ import './TermsAndConditions.css';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import PrivacyPolicyImage from "../assets/privacy-policy-matched.png";
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
@@ -10,8 +11,8 @@ const PrivacyPolicy = () => {
   return (
     <section className="home-container">
       <Navbar />
-      <button 
-        onClick={() => navigate(-1)} 
+      <button
+        onClick={() => navigate(-1)}
         style={{
           position: "absolute",
           top: "6rem",
@@ -31,38 +32,90 @@ const PrivacyPolicy = () => {
         <ArrowBackIosIcon style={{ fontSize: "1rem", verticalAlign: "middle" }} /> Back
       </button>
 
-      {/* Hero Section */}
-      <section className="home-banner-container" style={{ paddingTop: "4rem", marginBottom: "3rem", marginLeft: "5rem" }}>
-        <article className="home-text-section" style={{ flex: "1.5" }}>
-          <header>
-            <p style={{ fontSize: "1rem", color: "#FF6B35", fontWeight: 600, marginBottom: "0.5rem" }}>
-              Privacy Policy
+      {/* Hero Section - Modernized Layout */}
+      <section style={{
+        backgroundColor: "#f9f9f9",
+        padding: "5rem 2rem",
+        display: "flex",
+        justifyContent: "center",
+        overflow: "hidden"
+      }}>
+        <div style={{
+          maxWidth: "1200px",
+          width: "100%",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "4rem",
+          flexWrap: "wrap"
+        }}>
+          <article style={{ flex: "1 1 500px", minWidth: "300px" }}>
+            <header>
+              <p style={{
+                fontSize: "1rem",
+                color: "#FF6B35",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+                marginBottom: "1rem"
+              }}>
+                Privacy Policy
+              </p>
+              <h1 style={{
+                fontSize: "clamp(2.5rem, 5vw, 3.5rem)",
+                color: "#1B5E20",
+                lineHeight: "1.2",
+                fontWeight: 800,
+                marginBottom: "1.5rem"
+              }}>
+                Your Privacy Matters
+              </h1>
+            </header>
+            <p style={{
+              fontSize: "1.125rem",
+              color: "#4a4a4a",
+              lineHeight: "1.7",
+              marginBottom: "1.5rem"
+            }}>
+              At Konecbo, we are committed to protecting your privacy and ensuring the security of your personal information. This policy explains how we collect, use, and safeguard your data when you use our platform.
             </p>
-            <h1 className="primary-heading">
-              Your Privacy Matters
-            </h1>
-          </header>
-          <p className="primary-text">
-            At Konecbo, we are committed to protecting your privacy and ensuring the security of your personal information. This policy explains how we collect, use, and safeguard your data when you use our platform.
-          </p>
-          <p className="primary-text" style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#666", fontStyle: "italic" }}>
-            Last Updated: November 1, 2025
-          </p>
-        </article>
-        <figure className="home-image-section" style={{ flex: "1" }}>
-          <div style={{ 
-            width: "95%", 
-            height: "300px", 
-            backgroundColor: "#F1F8F4", 
-            borderRadius: "12px",
+            <p style={{
+              fontSize: "1rem",
+              color: "#666",
+              fontStyle: "italic",
+              marginTop: "2rem",
+              paddingTop: "1rem",
+              borderTop: "1px solid #e0e0e0",
+              display: "inline-block"
+            }}>
+              Last Updated: January 2026
+            </p>
+          </article>
+          <figure style={{
+            flex: "1 1 400px",
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
-            border: "2px solid rgba(46, 125, 50, 0.2)"
+            alignItems: "center",
+            margin: 0,
+            position: "relative"
           }}>
-            <span style={{ fontSize: "3rem", color: "#1B5E20" }}>🔒</span>
-          </div>
-        </figure>
+            <img
+              src={PrivacyPolicyImage}
+              alt="Privacy and Security Illustration"
+              style={{
+                width: "100%",
+                maxWidth: "500px",
+                height: "auto",
+                objectFit: "contain",
+                borderRadius: "12px",
+                // Fade effect for borders
+                maskImage: "radial-gradient(ellipse at center, black 60%, transparent 100%)",
+                WebkitMaskImage: "radial-gradient(ellipse at center, black 60%, transparent 100%)"
+              }}
+            />
+          </figure>
+        </div>
       </section>
 
       {/* Content Sections */}
@@ -214,7 +267,7 @@ const PrivacyPolicy = () => {
           </section>
         </div>
       </section>
-      
+
       <Footer />
     </section>
   );
