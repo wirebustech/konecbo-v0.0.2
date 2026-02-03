@@ -840,10 +840,8 @@ const EditProfile = () => {
             Save Profile
           </Button>
         </Box>
+      </Container>
     </Box>
-      </Container >
-
-    </Box >
   );
 };
 

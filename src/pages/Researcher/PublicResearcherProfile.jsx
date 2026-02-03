@@ -237,90 +237,91 @@ const PublicResearcherProfile = () => {
                             <CardContent>
                                 <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Details</Typography>
 
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <School fontSize="small" /> Education
-                                </Typography>
-                                <Typography variant="body1" fontWeight="500">{profile.highest_degree || 'Not specified'}</Typography>
-                                {profile.institution_name && (
-                                    <Typography variant="body2" color="textSecondary">{profile.institution_name}</Typography>
-                                )}
-                                {profile.graduation_year && (
-                                    <Typography variant="caption" color="textSecondary">Class of {profile.graduation_year}</Typography>
-                                )}
-                            </Box>
-                            <Divider sx={{ my: 1 }} />
-
-                            <Box sx={{ mb: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Book fontSize="small" /> Discipline
-                                </Typography>
-                                <Typography variant="body1">{profile.primary_discipline || 'Not specified'}</Typography>
-                                {profile.sub_discipline && (
-                                    <Typography variant="body2" color="textSecondary">{profile.sub_discipline}</Typography>
-                                )}
-                            </Box>
-                            <Divider sx={{ my: 1 }} />
-
-                            <Box sx={{ mb: 2 }}>
-                                <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Work fontSize="small" /> Experience
-                                </Typography>
-                                <Typography variant="body1">{profile.years_of_experience ? `${profile.years_of_experience} years` : 'Not specified'}</Typography>
-                            </Box>
-
-                            {profile.languages && profile.languages.length > 0 && (
-                                <>
-                                    <Divider sx={{ my: 1 }} />
-                                    <Box>
-                                        <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Language fontSize="small" /> Languages
-                                        </Typography>
-                                        <Typography variant="body1">{profile.languages.join(', ')}</Typography>
-                                    </Box>
-                                </>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    {/* Collaboration Logic */}
-                    <Card sx={{ borderRadius: 2 }}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Collaboration</Typography>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                {profile.looking_to_post && (
-                                    <Chip
-                                        icon={<Groups />}
-                                        label="Post Opportunities"
-                                        color="primary"
-                                        variant="outlined"
-                                        sx={{ justifyContent: 'flex-start', px: 1 }}
-                                    />
-                                )}
-                                {profile.looking_to_join && (
-                                    <Chip
-                                        icon={<Groups />}
-                                        label="Join Projects"
-                                        color="secondary"
-                                        variant="outlined"
-                                        sx={{ justifyContent: 'flex-start', px: 1 }}
-                                    />
-                                )}
-                                {!profile.looking_to_post && !profile.looking_to_join && (
-                                    <Typography variant="body2" color="text.secondary">No specific status set.</Typography>
-                                )}
-                            </Box>
-                            {profile.time_availability && (
-                                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <AccessTime fontSize="small" color="action" />
-                                    <Typography variant="body2">{profile.time_availability}</Typography>
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <School fontSize="small" /> Education
+                                    </Typography>
+                                    <Typography variant="body1" fontWeight="500">{profile.highest_degree || 'Not specified'}</Typography>
+                                    {profile.institution_name && (
+                                        <Typography variant="body2" color="textSecondary">{profile.institution_name}</Typography>
+                                    )}
+                                    {profile.graduation_year && (
+                                        <Typography variant="caption" color="textSecondary">Class of {profile.graduation_year}</Typography>
+                                    )}
                                 </Box>
-                            )}
-                        </CardContent>
-                    </Card>
+                                <Divider sx={{ my: 1 }} />
 
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Book fontSize="small" /> Discipline
+                                    </Typography>
+                                    <Typography variant="body1">{profile.primary_discipline || 'Not specified'}</Typography>
+                                    {profile.sub_discipline && (
+                                        <Typography variant="body2" color="textSecondary">{profile.sub_discipline}</Typography>
+                                    )}
+                                </Box>
+                                <Divider sx={{ my: 1 }} />
+
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Work fontSize="small" /> Experience
+                                    </Typography>
+                                    <Typography variant="body1">{profile.years_of_experience ? `${profile.years_of_experience} years` : 'Not specified'}</Typography>
+                                </Box>
+
+                                {profile.languages && profile.languages.length > 0 && (
+                                    <>
+                                        <Divider sx={{ my: 1 }} />
+                                        <Box>
+                                            <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Language fontSize="small" /> Languages
+                                            </Typography>
+                                            <Typography variant="body1">{profile.languages.join(', ')}</Typography>
+                                        </Box>
+                                    </>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        {/* Collaboration Logic */}
+                        <Card sx={{ borderRadius: 2 }}>
+                            <CardContent>
+                                <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Collaboration</Typography>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    {profile.looking_to_post && (
+                                        <Chip
+                                            icon={<Groups />}
+                                            label="Post Opportunities"
+                                            color="primary"
+                                            variant="outlined"
+                                            sx={{ justifyContent: 'flex-start', px: 1 }}
+                                        />
+                                    )}
+                                    {profile.looking_to_join && (
+                                        <Chip
+                                            icon={<Groups />}
+                                            label="Join Projects"
+                                            color="secondary"
+                                            variant="outlined"
+                                            sx={{ justifyContent: 'flex-start', px: 1 }}
+                                        />
+                                    )}
+                                    {!profile.looking_to_post && !profile.looking_to_join && (
+                                        <Typography variant="body2" color="text.secondary">No specific status set.</Typography>
+                                    )}
+                                </Box>
+                                {profile.time_availability && (
+                                    <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <AccessTime fontSize="small" color="action" />
+                                        <Typography variant="body2">{profile.time_availability}</Typography>
+                                    </Box>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Container>
+            </Container>
         </Box >
     );
 };
