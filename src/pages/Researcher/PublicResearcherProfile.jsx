@@ -97,8 +97,13 @@ const PublicResearcherProfile = () => {
                                 )}
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                     <Email fontSize="small" sx={{ color: '#aaa' }} />
-                                    <Typography variant="body2" color="#ccc">{profile.email}</Typography>
+                                    <Typography variant="body2" color="#ccc">{profile.institutional_email || profile.email}</Typography>
                                 </Box>
+                                {profile.orcid_id && (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Typography variant="body2" color="#ccc" sx={{ fontFamily: 'monospace' }}>ORCID: {profile.orcid_id}</Typography>
+                                    </Box>
+                                )}
                             </Box>
                             <Box sx={{ display: 'flex', gap: 2 }}>
                                 {profile.linkedin && (
@@ -179,6 +184,51 @@ const PublicResearcherProfile = () => {
                             </Card>
                         )}
 
+                        {/* Research Statement */}
+                        {profile.research_statement && (
+                            <Card sx={{ mb: 4, borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Research Statement</Typography>
+                                    <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
+                                        {profile.research_statement}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Publications */}
+                        {profile.publications && profile.publications.length > 0 && (
+                            <Card sx={{ mb: 4, borderRadius: 2 }}>
+                                <CardContent>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                                        <Typography variant="h6" sx={{ color: '#132238', fontWeight: 'bold' }}>Selected Publications</Typography>
+                                        {profile.number_of_publications && (
+                                            <Chip label={`Total: ${profile.number_of_publications}`} size="small" />
+                                        )}
+                                    </Box>
+                                    <Typography variant="body2" color="text.secondary" component="div">
+                                        <ul style={{ paddingLeft: 20, margin: 0 }}>
+                                            {(Array.isArray(profile.publications) ? profile.publications : profile.publications.split('\n')).map((pub, idx) => (
+                                                <li key={idx} style={{ marginBottom: 8 }}>{pub}</li>
+                                            ))}
+                                        </ul>
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Past Projects */}
+                        {profile.past_projects && (
+                            <Card sx={{ mb: 4, borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Past Projects</Typography>
+                                    <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
+                                        {profile.past_projects}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        )}
+
                     </Grid>
 
                     <Grid item xs={12} md={4}>
@@ -187,86 +237,91 @@ const PublicResearcherProfile = () => {
                             <CardContent>
                                 <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Details</Typography>
 
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <School fontSize="small" /> Highest Degree
-                                    </Typography>
-                                    <Typography variant="body1">{profile.highest_degree || 'Not specified'}</Typography>
-                                </Box>
-                                <Divider sx={{ my: 1 }} />
-
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Book fontSize="small" /> Discipline
-                                    </Typography>
-                                    <Typography variant="body1">{profile.primary_discipline || 'Not specified'}</Typography>
-                                    {profile.sub_discipline && (
-                                        <Typography variant="body2" color="textSecondary">{profile.sub_discipline}</Typography>
-                                    )}
-                                </Box>
-                                <Divider sx={{ my: 1 }} />
-
-                                <Box sx={{ mb: 2 }}>
-                                    <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Work fontSize="small" /> Experience
-                                    </Typography>
-                                    <Typography variant="body1">{profile.years_of_experience ? `${profile.years_of_experience} years` : 'Not specified'}</Typography>
-                                </Box>
-
-                                {profile.languages && profile.languages.length > 0 && (
-                                    <>
-                                        <Divider sx={{ my: 1 }} />
-                                        <Box>
-                                            <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Language fontSize="small" /> Languages
-                                            </Typography>
-                                            <Typography variant="body1">{profile.languages.join(', ')}</Typography>
-                                        </Box>
-                                    </>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <School fontSize="small" /> Education
+                                </Typography>
+                                <Typography variant="body1" fontWeight="500">{profile.highest_degree || 'Not specified'}</Typography>
+                                {profile.institution_name && (
+                                    <Typography variant="body2" color="textSecondary">{profile.institution_name}</Typography>
                                 )}
-                            </CardContent>
-                        </Card>
+                                {profile.graduation_year && (
+                                    <Typography variant="caption" color="textSecondary">Class of {profile.graduation_year}</Typography>
+                                )}
+                            </Box>
+                            <Divider sx={{ my: 1 }} />
 
-                        {/* Collaboration Logic */}
-                        <Card sx={{ borderRadius: 2 }}>
-                            <CardContent>
-                                <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Collaboration</Typography>
-                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                    {profile.looking_to_post && (
-                                        <Chip
-                                            icon={<Groups />}
-                                            label="Post Opportunities"
-                                            color="primary"
-                                            variant="outlined"
-                                            sx={{ justifyContent: 'flex-start', px: 1 }}
-                                        />
-                                    )}
-                                    {profile.looking_to_join && (
-                                        <Chip
-                                            icon={<Groups />}
-                                            label="Join Projects"
-                                            color="secondary"
-                                            variant="outlined"
-                                            sx={{ justifyContent: 'flex-start', px: 1 }}
-                                        />
-                                    )}
-                                    {!profile.looking_to_post && !profile.looking_to_join && (
-                                        <Typography variant="body2" color="text.secondary">No specific status set.</Typography>
-                                    )}
-                                </Box>
-                                {profile.time_availability && (
-                                    <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <AccessTime fontSize="small" color="action" />
-                                        <Typography variant="body2">{profile.time_availability}</Typography>
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Book fontSize="small" /> Discipline
+                                </Typography>
+                                <Typography variant="body1">{profile.primary_discipline || 'Not specified'}</Typography>
+                                {profile.sub_discipline && (
+                                    <Typography variant="body2" color="textSecondary">{profile.sub_discipline}</Typography>
+                                )}
+                            </Box>
+                            <Divider sx={{ my: 1 }} />
+
+                            <Box sx={{ mb: 2 }}>
+                                <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Work fontSize="small" /> Experience
+                                </Typography>
+                                <Typography variant="body1">{profile.years_of_experience ? `${profile.years_of_experience} years` : 'Not specified'}</Typography>
+                            </Box>
+
+                            {profile.languages && profile.languages.length > 0 && (
+                                <>
+                                    <Divider sx={{ my: 1 }} />
+                                    <Box>
+                                        <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <Language fontSize="small" /> Languages
+                                        </Typography>
+                                        <Typography variant="body1">{profile.languages.join(', ')}</Typography>
                                     </Box>
-                                )}
-                            </CardContent>
-                        </Card>
+                                </>
+                            )}
+                        </CardContent>
+                    </Card>
 
-                    </Grid>
+                    {/* Collaboration Logic */}
+                    <Card sx={{ borderRadius: 2 }}>
+                        <CardContent>
+                            <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Collaboration</Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                {profile.looking_to_post && (
+                                    <Chip
+                                        icon={<Groups />}
+                                        label="Post Opportunities"
+                                        color="primary"
+                                        variant="outlined"
+                                        sx={{ justifyContent: 'flex-start', px: 1 }}
+                                    />
+                                )}
+                                {profile.looking_to_join && (
+                                    <Chip
+                                        icon={<Groups />}
+                                        label="Join Projects"
+                                        color="secondary"
+                                        variant="outlined"
+                                        sx={{ justifyContent: 'flex-start', px: 1 }}
+                                    />
+                                )}
+                                {!profile.looking_to_post && !profile.looking_to_join && (
+                                    <Typography variant="body2" color="text.secondary">No specific status set.</Typography>
+                                )}
+                            </Box>
+                            {profile.time_availability && (
+                                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <AccessTime fontSize="small" color="action" />
+                                    <Typography variant="body2">{profile.time_availability}</Typography>
+                                </Box>
+                            )}
+                        </CardContent>
+                    </Card>
+
                 </Grid>
-            </Container>
-        </Box>
+            </Grid>
+        </Container>
+        </Box >
     );
 };
 

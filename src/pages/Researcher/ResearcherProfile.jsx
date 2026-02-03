@@ -110,8 +110,14 @@ const ResearcherProfile = () => {
                 )}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                   <Email fontSize="small" sx={{ color: '#aaa' }} />
-                  <Typography variant="body2" color="#ccc">{profile.email}</Typography>
+                  <Typography variant="body2" color="#ccc">{profile.institutional_email || profile.email}</Typography>
                 </Box>
+                {/* ORCID */}
+                {profile.orcid_id && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography variant="body2" color="#ccc" sx={{ fontFamily: 'monospace' }}>ORCID: {profile.orcid_id}</Typography>
+                  </Box>
+                )}
               </Box>
             </Grid>
             <Grid item sx={{ display: 'flex', gap: 2 }}>
@@ -204,6 +210,57 @@ const ResearcherProfile = () => {
               </CardContent>
             </Card>
 
+            {/* Research Statement */}
+            <Card sx={{ mb: 4, borderRadius: 2 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Research Statement</Typography>
+                {profile.research_statement ? (
+                  <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
+                    {profile.research_statement}
+                  </Typography>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" fontStyle="italic">No research statement provided.</Typography>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Publications */}
+            <Card sx={{ mb: 4, borderRadius: 2 }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6" sx={{ color: '#132238', fontWeight: 'bold' }}>Selected Publications</Typography>
+                  {profile.number_of_publications && (
+                    <Chip label={`Total: ${profile.number_of_publications}`} size="small" />
+                  )}
+                </Box>
+                {profile.publications && profile.publications.length > 0 ? (
+                  <Typography variant="body2" color="text.secondary" component="div">
+                    <ul style={{ paddingLeft: 20, margin: 0 }}>
+                      {(Array.isArray(profile.publications) ? profile.publications : profile.publications.split('\n')).map((pub, idx) => (
+                        <li key={idx} style={{ marginBottom: 8 }}>{pub}</li>
+                      ))}
+                    </ul>
+                  </Typography>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" fontStyle="italic">No publications listed.</Typography>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Past Projects */}
+            <Card sx={{ mb: 4, borderRadius: 2 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom sx={{ color: '#132238', fontWeight: 'bold' }}>Past Projects</Typography>
+                {profile.past_projects ? (
+                  <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
+                    {profile.past_projects}
+                  </Typography>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" fontStyle="italic">No past projects detailed.</Typography>
+                )}
+              </CardContent>
+            </Card>
+
           </Grid>
 
           <Grid item xs={12} md={4}>
@@ -214,9 +271,15 @@ const ResearcherProfile = () => {
 
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="subtitle2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <School fontSize="small" /> Highest Degree
+                    <School fontSize="small" /> Education
                   </Typography>
-                  <Typography variant="body1">{profile.highest_degree || 'Not specified'}</Typography>
+                  <Typography variant="body1" fontWeight="500">{profile.highest_degree || 'Not specified'}</Typography>
+                  {profile.institution_name && (
+                    <Typography variant="body2" color="textSecondary">{profile.institution_name}</Typography>
+                  )}
+                  {profile.graduation_year && (
+                    <Typography variant="caption" color="textSecondary">Class of {profile.graduation_year}</Typography>
+                  )}
                 </Box>
                 <Divider sx={{ my: 1 }} />
 
@@ -291,7 +354,7 @@ const ResearcherProfile = () => {
           </Grid>
         </Grid>
       </Container>
-    </Box>
+    </Box >
   );
 };
 

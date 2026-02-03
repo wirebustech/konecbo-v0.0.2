@@ -31,6 +31,15 @@ export const useEditProfileLogic = () => {
     website: '',
     linkedin: '',
     twitter: '',
+    // Detailed Academic/Research Fields
+    orcidId: '',
+    institutionName: '', // Alma mater? Or current institution detailed? Schema has 'institution' (current) and 'institution_name' (education?)
+    graduationYear: '',
+    institutionalEmail: '',
+    numberOfPublications: '',
+    publications: '', // Text area or comma sep
+    pastProjects: '',
+    researchStatement: '',
   });
 
   const [userId, setUserId] = useState(null);
@@ -84,6 +93,15 @@ export const useEditProfileLogic = () => {
             website: p.website || '',
             linkedin: p.linkedin || '',
             twitter: p.twitter || '',
+            // Populate new fields
+            orcidId: p.orcid_id || '',
+            institutionName: p.institution_name || '',
+            graduationYear: p.graduation_year || '',
+            institutionalEmail: p.institutional_email || '',
+            numberOfPublications: p.number_of_publications || '',
+            publications: Array.isArray(p.publications) ? p.publications.join('\n') : (p.publications || ''), // Display line separated for text area
+            pastProjects: p.past_projects || '',
+            researchStatement: p.research_statement || '',
           });
         }
       } catch (err) {
@@ -130,6 +148,15 @@ export const useEditProfileLogic = () => {
         website: profile.website,
         linkedin: profile.linkedin,
         twitter: profile.twitter,
+        // New Fields
+        orcidId: profile.orcidId,
+        institutionName: profile.institutionName, // e.g., for Highest Degree institution
+        graduationYear: profile.graduationYear ? parseInt(profile.graduationYear) : null,
+        institutionalEmail: profile.institutionalEmail,
+        numberOfPublications: profile.numberOfPublications ? parseInt(profile.numberOfPublications) : null,
+        publications: profile.publications.split('\n').map(s => s.trim()).filter(Boolean), // Split by new line
+        pastProjects: profile.pastProjects,
+        researchStatement: profile.researchStatement,
       };
 
       try {
