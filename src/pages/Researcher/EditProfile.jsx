@@ -99,12 +99,20 @@ const EditProfile = () => {
             Update your research profile information
           </Typography>
         </Box>
-        <IconButton
-          onClick={(e) => setMenuAnchorEl(e.currentTarget)}
-          sx={{ color: 'var(--white)' }}
-        >
-          <MenuIcon />
-        </IconButton>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            onClick={() => navigate('/researcher-dashboard')}
+            sx={{ color: '#64CCC5', display: { xs: 'none', sm: 'block' } }}
+          >
+            Dashboard
+          </Button>
+          <IconButton
+            onClick={(e) => setMenuAnchorEl(e.currentTarget)}
+            sx={{ color: 'var(--white)' }}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Box>
 
         <Menu
           anchorEl={menuAnchorEl}
@@ -841,7 +849,7 @@ const EditProfile = () => {
           </Button>
         </Box>
       </Container>
-    </Box>
+    </Box >
   );
 };
 

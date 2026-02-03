@@ -138,6 +138,17 @@ const ResearcherProfile = () => {
                 View Public
               </Button>
               <Button
+                variant="outlined"
+                sx={{
+                  color: 'white',
+                  borderColor: 'white',
+                  '&:hover': { borderColor: '#64CCC5', color: '#64CCC5' }
+                }}
+                onClick={() => navigate('/researcher-dashboard')}
+              >
+                Dashboard
+              </Button>
+              <Button
                 variant="contained"
                 startIcon={<Edit />}
                 sx={{

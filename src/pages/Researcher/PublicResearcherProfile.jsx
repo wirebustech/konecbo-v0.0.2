@@ -66,6 +66,20 @@ const PublicResearcherProfile = () => {
                 mb: -6,
                 position: 'relative'
             }}>
+                {/* Back/Dashboard Button */}
+                <Button
+                    onClick={() => navigate('/researcher-dashboard')}
+                    sx={{
+                        position: 'absolute',
+                        top: 20,
+                        left: 20,
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        '&:hover': { color: '#64CCC5', bgcolor: 'transparent' }
+                    }}
+                    startIcon={<School />} // Or any icon like ArrowBack
+                >
+                    Dashboard
+                </Button>
                 <Container maxWidth="lg">
                     <Grid container spacing={4} alignItems="center">
                         <Grid item>
