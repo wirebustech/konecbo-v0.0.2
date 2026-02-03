@@ -7,7 +7,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {
   Box, Button, IconButton, Menu, MenuItem, Typography,
   TextField, Select, InputLabel, FormControl, Avatar,
-  Container
+  Container, Checkbox, FormControlLabel, FormGroup
 } from '@mui/material';
 import { useEditProfileLogic } from './researcherEditProfileLogic';
 
@@ -386,6 +386,248 @@ const EditProfile = () => {
               }}
             />
           )}
+          {/* Sub-Discipline */}
+          <TextField
+            name="subDiscipline"
+            label="Sub-Discipline / Specialization"
+            value={profile.subDiscipline || ''}
+            onChange={logicHandleChange}
+            fullWidth
+            sx={{
+              mb: 3,
+              '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+              '& .MuiInputLabel-root': { color: '#64CCC5' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#64CCC5' },
+                '&:hover fieldset': { borderColor: '#64CCC5' }
+              },
+            }}
+          />
+
+          {/* Research Interests */}
+          <TextField
+            name="researchInterests"
+            label="Research Interests (comma separated)"
+            value={profile.researchInterests || ''}
+            onChange={logicHandleChange}
+            fullWidth
+            sx={{
+              mb: 3,
+              '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+              '& .MuiInputLabel-root': { color: '#64CCC5' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#64CCC5' },
+                '&:hover fieldset': { borderColor: '#64CCC5' }
+              },
+            }}
+          />
+
+          {/* Academic Information Section */}
+          <Typography variant="h6" sx={{
+            color: '#64CCC5',
+            mb: 3,
+            mt: 4,
+            borderBottom: '1px solid #64CCC5',
+            pb: 1,
+            fontSize: '1.1rem'
+          }}>
+            Academic Information
+          </Typography>
+
+          <Box sx={{
+            display: 'grid',
+            gridTemplateColumns: { sm: '1fr 1fr' },
+            gap: 3,
+            mb: 3
+          }}>
+            <TextField
+              name="highestDegree"
+              label="Highest Degree Obtained"
+              value={profile.highestDegree || ''}
+              onChange={logicHandleChange}
+              fullWidth
+              sx={{
+                '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+                '& .MuiInputLabel-root': { color: '#64CCC5' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: '#64CCC5' },
+                  '&:hover fieldset': { borderColor: '#64CCC5' }
+                },
+              }}
+            />
+            <TextField
+              name="yearsOfExperience"
+              label="Years of Experience"
+              type="number"
+              value={profile.yearsOfExperience || ''}
+              onChange={logicHandleChange}
+              fullWidth
+              sx={{
+                '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+                '& .MuiInputLabel-root': { color: '#64CCC5' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: '#64CCC5' },
+                  '&:hover fieldset': { borderColor: '#64CCC5' }
+                },
+              }}
+            />
+          </Box>
+
+          <TextField
+            name="languages"
+            label="Languages Spoken (comma separated)"
+            value={profile.languages || ''}
+            onChange={logicHandleChange}
+            fullWidth
+            sx={{
+              mb: 3,
+              '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+              '& .MuiInputLabel-root': { color: '#64CCC5' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#64CCC5' },
+                '&:hover fieldset': { borderColor: '#64CCC5' }
+              },
+            }}
+          />
+
+          <TextField
+            name="skills"
+            label="Skills & Expertise (comma separated)"
+            value={profile.skills || ''}
+            onChange={logicHandleChange}
+            multiline
+            rows={2}
+            fullWidth
+            sx={{
+              mb: 3,
+              '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+              '& .MuiInputLabel-root': { color: '#64CCC5' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#64CCC5' },
+                '&:hover fieldset': { borderColor: '#64CCC5' }
+              },
+            }}
+          />
+
+          {/* Collaboration Preferences */}
+          <Typography variant="h6" sx={{
+            color: '#64CCC5',
+            mb: 3,
+            mt: 4,
+            borderBottom: '1px solid #64CCC5',
+            pb: 1,
+            fontSize: '1.1rem'
+          }}>
+            Collaboration Preferences
+          </Typography>
+
+          <FormGroup sx={{ mb: 3 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={profile.lookingToPost || false}
+                  onChange={logicHandleChange}
+                  name="lookingToPost"
+                  sx={{ color: '#64CCC5', '&.Mui-checked': { color: '#64CCC5' } }}
+                />
+              }
+              label={<Typography sx={{ color: '#fff' }}>I am looking to post research opportunities</Typography>}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={profile.lookingToJoin || false}
+                  onChange={logicHandleChange}
+                  name="lookingToJoin"
+                  sx={{ color: '#64CCC5', '&.Mui-checked': { color: '#64CCC5' } }}
+                />
+              }
+              label={<Typography sx={{ color: '#fff' }}>I am looking to join research projects</Typography>}
+            />
+          </FormGroup>
+
+          <TextField
+            name="timeAvailability"
+            label="Time Availability (e.g., 10 hrs/week, Weekends only)"
+            value={profile.timeAvailability || ''}
+            onChange={logicHandleChange}
+            fullWidth
+            sx={{
+              mb: 3,
+              '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+              '& .MuiInputLabel-root': { color: '#64CCC5' },
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: '#64CCC5' },
+                '&:hover fieldset': { borderColor: '#64CCC5' }
+              },
+            }}
+          />
+
+          {/* Social & Contact */}
+          <Typography variant="h6" sx={{
+            color: '#64CCC5',
+            mb: 3,
+            mt: 4,
+            borderBottom: '1px solid #64CCC5',
+            pb: 1,
+            fontSize: '1.1rem'
+          }}>
+            Social & Contact
+          </Typography>
+
+          <Box sx={{
+            display: 'grid',
+            gridTemplateColumns: { sm: '1fr 1fr' },
+            gap: 3,
+            mb: 3
+          }}>
+            <TextField
+              name="website"
+              label="Personal Website / Portfolio"
+              value={profile.website || ''}
+              onChange={logicHandleChange}
+              fullWidth
+              sx={{
+                '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+                '& .MuiInputLabel-root': { color: '#64CCC5' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: '#64CCC5' },
+                  '&:hover fieldset': { borderColor: '#64CCC5' }
+                },
+              }}
+            />
+            <TextField
+              name="linkedin"
+              label="LinkedIn Profile URL"
+              value={profile.linkedin || ''}
+              onChange={logicHandleChange}
+              fullWidth
+              sx={{
+                '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+                '& .MuiInputLabel-root': { color: '#64CCC5' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: '#64CCC5' },
+                  '&:hover fieldset': { borderColor: '#64CCC5' }
+                },
+              }}
+            />
+            <TextField
+              name="twitter"
+              label="Twitter / X Profile URL"
+              value={profile.twitter || ''}
+              onChange={logicHandleChange}
+              fullWidth
+              sx={{
+                gridColumn: { sm: 'span 2' },
+                '& .MuiInputBase-root': { bgcolor: '#132238', color: '#FFFFFF' },
+                '& .MuiInputLabel-root': { color: '#64CCC5' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: '#64CCC5' },
+                  '&:hover fieldset': { borderColor: '#64CCC5' }
+                },
+              }}
+            />
+          </Box>
 
           {/* Biography */}
           <TextField

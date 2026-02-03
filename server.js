@@ -10,6 +10,7 @@ require('dotenv').config();
 const authRoutes = require('./server/routes/authRoutes');
 const adminRoutes = require('./server/routes/adminRoutes');
 const listingRoutes = require('./server/routes/listingRoutes');
+const researcherRoutes = require('./server/routes/researcherRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -34,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/listings', listingRoutes);
+app.use('/api/researchers', researcherRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

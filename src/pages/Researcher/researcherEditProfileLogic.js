@@ -18,6 +18,19 @@ export const useEditProfileLogic = () => {
     profilePicture: null,
     university: '',
     country: '',
+    // New Fields
+    subDiscipline: '',
+    researchInterests: '',
+    languages: '',
+    highestDegree: '',
+    yearsOfExperience: '',
+    skills: '',
+    lookingToPost: false,
+    lookingToJoin: false,
+    timeAvailability: '',
+    website: '',
+    linkedin: '',
+    twitter: '',
   });
 
   const [userId, setUserId] = useState(null);
@@ -58,6 +71,19 @@ export const useEditProfileLogic = () => {
             profilePicture: null, // Image upload unavailable
             university: p.institution || '',
             country: p.country || '',
+            // Populate new fields
+            subDiscipline: p.sub_discipline || '',
+            researchInterests: Array.isArray(p.research_interests) ? p.research_interests.join(', ') : (p.research_interests || ''),
+            languages: Array.isArray(p.languages) ? p.languages.join(', ') : (p.languages || ''),
+            highestDegree: p.highest_degree || '',
+            yearsOfExperience: p.years_of_experience || '',
+            skills: Array.isArray(p.skills) ? p.skills.join(', ') : (p.skills || ''),
+            lookingToPost: p.looking_to_post || false,
+            lookingToJoin: p.looking_to_join || false,
+            timeAvailability: p.time_availability || '',
+            website: p.website || '',
+            linkedin: p.linkedin || '',
+            twitter: p.twitter || '',
           });
         }
       } catch (err) {
@@ -67,12 +93,15 @@ export const useEditProfileLogic = () => {
   }, [userId]);
 
   // 3. FIELD CHANGE HANDLER
-  const handleChange = ({ target: { name, value, files } }) => {
+  const handleChange = ({ target: { name, value, type, checked, files } }) => {
     if (name === 'profilePicture') {
       // setProfile((prev) => ({ ...prev, profilePicture: files[0] }));
       toast.info("Image upload is currently disabled.");
     } else {
-      setProfile((prev) => ({ ...prev, [name]: value }));
+      setProfile((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
     }
   };
 
@@ -88,6 +117,19 @@ export const useEditProfileLogic = () => {
         country: profile.country,
         primaryDiscipline: profile.researchArea,
         bio: profile.biography,
+        // New Fields
+        subDiscipline: profile.subDiscipline,
+        researchInterests: profile.researchInterests.split(',').map(s => s.trim()).filter(Boolean),
+        languages: profile.languages.split(',').map(s => s.trim()).filter(Boolean),
+        highestDegree: profile.highestDegree,
+        yearsOfExperience: profile.yearsOfExperience ? parseInt(profile.yearsOfExperience) : null,
+        skills: profile.skills.split(',').map(s => s.trim()).filter(Boolean),
+        lookingToPost: profile.lookingToPost,
+        lookingToJoin: profile.lookingToJoin,
+        timeAvailability: profile.timeAvailability,
+        website: profile.website,
+        linkedin: profile.linkedin,
+        twitter: profile.twitter,
       };
 
       try {
