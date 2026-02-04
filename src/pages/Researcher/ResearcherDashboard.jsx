@@ -24,7 +24,7 @@ import {
 import { Notifications, Menu as MenuIcon, Close } from '@mui/icons-material';
 import CollaborationRequestsPanel from '../../components/CollaborationRequestsPanel';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import FloatingHelpChat from '../../components/FloatingHelpChat';
+import ChatWidget from '../../components/Chat/ChatWidget';
 
 function getFirstNSentences(text, n = 1) {
   if (!text) return "";
@@ -840,7 +840,7 @@ const ResearcherDashboard = () => {
         </Dialog>
       </section>
 
-      <FloatingHelpChat chatId={`support_${userId}`} title="Contact Admin Support" />
+      <ChatWidget currentUserRole="researcher" />
     </main>
   );
 };

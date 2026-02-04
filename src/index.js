@@ -7,13 +7,17 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './pages/Reviewer/authContext'; // Import AuthProvider
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { ChatProvider } from './contexts/ChatContext';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ChatProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ChatProvider>
     </AuthProvider>
   </React.StrictMode>
 );

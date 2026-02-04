@@ -9,6 +9,7 @@ import ManageAdmins from "./ManageAdmins";
 import SystemSettings from "./SystemSettings";
 import AdminProfile from "./AdminProfile";
 import ReviewerPage from "../Reviewer/ReviewerPage"; // Integrating Reviewer Portal directly 
+import ChatWidget from "../../components/Chat/ChatWidget";
 import "./AdminPage.css";
 
 export default function AdminPage() {
@@ -32,6 +33,7 @@ export default function AdminPage() {
             <ReviewerPage adminView={true} />
           </div>
         )}
+        <ChatWidget currentUserRole="admin" />
       </main>
     </div>
   );
