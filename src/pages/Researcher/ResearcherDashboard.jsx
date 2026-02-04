@@ -19,9 +19,11 @@ import {
   TextField,
   Box,
   DialogActions,
-  Stack
+  Stack,
+  Grid // Added
 } from '@mui/material';
 import { Notifications, Menu as MenuIcon, Close } from '@mui/icons-material';
+import PersonIcon from '@mui/icons-material/Person'; // Added
 import CollaborationRequestsPanel from '../../components/CollaborationRequestsPanel';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ChatWidget from '../../components/Chat/ChatWidget';
@@ -163,6 +165,7 @@ const ResearcherDashboard = () => {
     showNoResults,
     filteredListings, setFilteredListings,
     userName, setUserName,
+    friends, // Added
     setMessages,
 
     setIpAddress,
@@ -773,20 +776,43 @@ const ResearcherDashboard = () => {
           </Box>
         </section>
 
-        {/* Collaboration Requests Section */}
+        {/* Friends Section */}
         <section style={{ maxWidth: 1200, margin: '48px auto 0 auto' }}>
-          <Paper
-            sx={{
-              p: 2,
-              bgcolor: '#fff',
-              color: '#222',
-              boxShadow: "0 6px 24px rgba(30, 60, 90, 0.10)",
-              borderRadius: "1.2rem",
-              mb: 4
-            }}
-          >
-            <CollaborationRequestsPanel />
-          </Paper>
+          <h2 style={{ marginBottom: 24, fontSize: '1.7rem', fontWeight: 700, color: 'var(--dark-blue)' }}>My Connections</h2>
+          {friends && friends.length > 0 ? (
+            <Grid container spacing={2}>
+              {friends.map(friend => (
+                <Grid item xs={12} sm={6} md={4} key={friend.id}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      borderRadius: 3,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                      border: '1px solid #eee'
+                    }}
+                  >
+                    <Box sx={{
+                      width: 50, height: 50, borderRadius: '50%', bgcolor: '#e3f2fd',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#1976d2'
+                    }}>
+                      <PersonIcon />
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight={600}>{friend.full_name}</Typography>
+                      <Typography variant="caption" color="textSecondary">{friend.email}</Typography>
+                    </Box>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Paper sx={{ p: 4, textAlign: 'center', color: '#666', bgcolor: '#fff', borderRadius: 3 }}>
+              <Typography>No connections yet. Find researchers and click "Connect" on their projects!</Typography>
+            </Paper>
+          )}
         </section>
 
         {/* Pending Review Requests */}

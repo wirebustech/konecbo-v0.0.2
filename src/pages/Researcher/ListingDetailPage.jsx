@@ -5,8 +5,12 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Box, Typography, Button, IconButton, CircularProgress, Chip, Paper, Grid, Divider } from '@mui/material';
 import authService from '../../services/authService';
 import listingService from '../../services/listingService';
+import friendService from '../../services/friendService'; // Added
 import { toast } from 'react-toastify';
 import PersonIcon from '@mui/icons-material/Person';
+import PersonAddIcon from '@mui/icons-material/PersonAdd'; // Added
+import CheckIcon from '@mui/icons-material/Check'; // Added
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'; // Added
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 
@@ -16,6 +20,8 @@ const ListingDetailPage = () => {
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
+  const [friendStatus, setFriendStatus] = useState('none'); // none, sent, received, accepted
+  const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
     const user = authService.getCurrentUser();
@@ -24,7 +30,19 @@ const ListingDetailPage = () => {
     const fetchListing = async () => {
       try {
         const response = await listingService.getListingById(id);
-        setListing(response.listing);
+        const listingData = response.listing;
+        setListing(listingData);
+
+        // Check friend status if not own listing
+        if (user && listingData.researcher_id && user.id !== listingData.researcher_id) {
+          try {
+            const statusData = await friendService.checkStatus(listingData.researcher_id);
+            setFriendStatus(statusData.status);
+          } catch (err) {
+            console.error("Error checking friend status", err);
+          }
+        }
+
       } catch (error) {
         console.error("Error fetching listing:", error);
         toast.error("Failed to load listing details.");
@@ -35,6 +53,20 @@ const ListingDetailPage = () => {
 
     fetchListing();
   }, [id]);
+
+  const handleConnect = async () => {
+    if (!listing || !currentUser) return;
+    setActionLoading(true);
+    try {
+      await friendService.sendRequest(listing.researcher_id);
+      toast.success("Friend request sent!");
+      setFriendStatus('sent');
+    } catch (error) {
+      toast.error(error.message || "Failed to send request");
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   if (loading) return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
@@ -76,11 +108,39 @@ const ListingDetailPage = () => {
                 <Typography variant="h3" sx={{ fontWeight: 800, color: '#1a237e', mb: 1 }}>
                   {listing.title}
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#555' }}>
-                  <PersonIcon fontSize="small" />
-                  <Typography variant="subtitle1">
-                    Researcher: <strong>{listing.researcherName || 'Unknown'}</strong>
-                  </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: '#555', mt: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <PersonIcon fontSize="small" />
+                    <Typography variant="subtitle1">
+                      Researcher: <strong>{listing.researcherName || 'Unknown'}</strong>
+                    </Typography>
+                  </Box>
+
+                  {/* Connect Button */}
+                  {!isOwner && currentUser && (
+                    <Box>
+                      {friendStatus === 'none' && (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          startIcon={<PersonAddIcon />}
+                          onClick={handleConnect}
+                          disabled={actionLoading}
+                        >
+                          Connect
+                        </Button>
+                      )}
+                      {friendStatus === 'sent' && (
+                        <Chip size="small" icon={<HourglassEmptyIcon />} label="Request Sent" color="primary" variant="outlined" />
+                      )}
+                      {friendStatus === 'received' && (
+                        <Chip size="small" label="Request Received" color="warning" variant="outlined" />
+                      )}
+                      {friendStatus === 'accepted' && (
+                        <Chip size="small" icon={<CheckIcon />} label="Friend" color="success" variant="outlined" />
+                      )}
+                    </Box>
+                  )}
                 </Box>
               </Box>
               {/* Status Chip */}

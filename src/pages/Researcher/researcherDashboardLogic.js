@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import authService from '../../services/authService';
 import listingService from '../../services/listingService';
+import friendService from '../../services/friendService'; // Added
 import { toast } from 'react-toastify';
 
 export function useResearcherDashboard() {
@@ -21,6 +22,8 @@ export function useResearcherDashboard() {
   const [filteredListings, setFilteredListings] = useState([]);
   const [userName, setUserName] = useState('');
   const [messages, setMessages] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([]); // Added
+  const [friends, setFriends] = useState([]); // Added
   const [showContactForm, setShowContactForm] = useState(false);
   const [ipAddress, setIpAddress] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
@@ -92,12 +95,20 @@ export function useResearcherDashboard() {
 
     const fetchData = async () => {
       try {
-        console.log("Fetching listings...");
+        console.log("Fetching listings and friends...");
         const allResponse = await listingService.getAllListings();
         setAllListings(allResponse.listings || []);
 
         const myResponse = await listingService.getMyListings();
         setMyListings(myResponse.listings || []);
+
+        // Fetch Friends & Requests
+        const friendsData = await friendService.getFriends();
+        setFriends(friendsData.friends || []);
+
+        const requestsData = await friendService.getRequests();
+        setFriendRequests(requestsData.requests || []);
+
       } catch (error) {
         console.error("Error loading dashboard data:", error);
         // toast.error("Could not load listings"); // Optional: don't spam if backend is offline
@@ -187,19 +198,52 @@ export function useResearcherDashboard() {
   };
 
   const handleAcceptCollab = async (message) => {
+    if (message.type === 'friend-request') {
+      try {
+        await friendService.acceptRequest(message.id);
+        toast.success("Friend request accepted!");
+
+        // Refresh data
+        const friendsData = await friendService.getFriends();
+        setFriends(friendsData.friends || []);
+        setFriendRequests(prev => prev.filter(r => r.id !== message.id));
+      } catch (err) {
+        toast.error(err.message || "Failed to accept");
+      }
+      return;
+    }
+
     toast.info("Collaboration feature currently unavailable.");
   };
 
   const handleRejectCollab = async (message) => {
+    if (message.type === 'friend-request') {
+      // Reject logic (not strictly in backend yet, but we can treat as ignore or add reject endpoint later)
+      toast.info("Request ignored temporarily."); // Todo: implement reject endpoint
+      return;
+    }
     toast.info("Collaboration feature currently unavailable.");
   };
 
   const handleClearNotifications = async () => {
     setMessages([]);
+    // Don't clear friend requests from just clicking "clear" usually, but for now we keep UI simple
   };
 
   // Combine messages + review requests (stubbed)
-  const combinedNotifications = [];
+  // Combine friend requests into notifications
+  const combinedNotifications = [
+    ...friendRequests.map(req => ({
+      id: req.id,
+      title: "Friend Request",
+      content: `${req.full_name} (${req.email}) sent you a friend request.`,
+      timestamp: new Date(req.created_at),
+      read: false,
+      type: 'friend-request',
+      senderName: req.full_name
+    })),
+    ...messages
+  ];
 
   const handleShowReviewers = async (listingId) => {
     toast.info("Reviewers feature currently unavailable.");
@@ -248,6 +292,8 @@ export function useResearcherDashboard() {
     filteredListings, setFilteredListings,
     userName, setUserName,
     messages, setMessages,
+    friends, setFriends, // Exported
+    friendRequests, setFriendRequests, // Exported
     showContactForm, setShowContactForm,
     ipAddress, setIpAddress,
     anchorEl, setAnchorEl,
