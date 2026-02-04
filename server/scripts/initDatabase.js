@@ -155,6 +155,21 @@ const createTables = async () => {
       );
     `);
 
+    // Chat Messages table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        sender_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        recipient_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        content TEXT NOT NULL,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_messages_sender_id ON messages(sender_id);
+      CREATE INDEX IF NOT EXISTS idx_messages_recipient_id ON messages(recipient_id);
+      CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);
+    `);
+
     // Password reset tokens
     await client.query(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (

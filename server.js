@@ -12,8 +12,25 @@ const adminRoutes = require('./server/routes/adminRoutes');
 const listingRoutes = require('./server/routes/listingRoutes');
 const researcherRoutes = require('./server/routes/researcherRoutes');
 
+const http = require('http');
+const { Server } = require("socket.io"); // Socket.io
+
 const app = express();
+const server = http.createServer(app); // Wrap express app
+
 const PORT = process.env.PORT || 5000;
+
+// Socket.io Setup
+const io = new Server(server, {
+    cors: {
+        origin: process.env.CLIENT_URL || ['http://localhost:3000', 'https://konecbo-main.azurewebsites.net'],
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
+
+// Initialize Socket Logic
+require('./server/socket/socketHandler')(io);
 
 // Middleware
 app.use(helmet({
@@ -86,8 +103,8 @@ const startServer = async () => {
     }
 
     try {
-        app.listen(PORT, () => {
-            console.log(`🚀 Konecbo API v0.0.3 (Fixed Build) running on port ${PORT}`);
+        server.listen(PORT, () => {
+            console.log(`🚀 Konecbo API v0.0.3 (Socket.io Enabled) running on port ${PORT}`);
             console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
             console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'Default (localhost & Azure Domain)'}`);
         });
