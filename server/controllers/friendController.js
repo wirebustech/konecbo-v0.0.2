@@ -151,3 +151,31 @@ exports.checkFriendStatus = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
     }
 };
+
+/**
+ * Remove a friend (Disconnect)
+ * @route DELETE /api/friends/:friendId
+ */
+exports.removeFriend = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const friendId = req.params.friendId;
+
+        const result = await pool.query(
+            `DELETE FROM friendships 
+             WHERE (requester_id = $1 AND addressee_id = $2) 
+                OR (requester_id = $2 AND addressee_id = $1)
+             RETURNING id`,
+            [userId, friendId]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ success: false, message: "Friendship not found" });
+        }
+
+        res.json({ success: true, message: "Friend removed successfully" });
+    } catch (error) {
+        console.error("removeFriend error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
+};

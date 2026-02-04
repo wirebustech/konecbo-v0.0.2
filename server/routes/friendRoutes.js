@@ -10,5 +10,6 @@ router.post('/accept/:requestId', friendController.acceptFriendRequest);
 router.get('/', friendController.getFriends);
 router.get('/requests', friendController.getFriendRequests);
 router.get('/status/:userId', friendController.checkFriendStatus);
+router.delete('/:friendId', friendController.removeFriend);
 
 module.exports = router;

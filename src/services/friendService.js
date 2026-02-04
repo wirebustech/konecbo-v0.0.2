@@ -71,6 +71,16 @@ const friendService = {
         } catch (error) {
             throw error.response?.data || { message: 'Failed to check friend status' };
         }
+    },
+
+    // Remove friend
+    removeFriend: async (friendId) => {
+        try {
+            const response = await api.delete(`/${friendId}`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to remove friend' };
+        }
     }
 };
 
