@@ -58,6 +58,12 @@ export default function Sidebar({ activeTab, setActiveTab }) {
               <span className="sidebar-nav-text">Manage Reviewers</span>
             </button>
             <button
+              className={`sidebar-nav-btn${activeTab === "reviews" ? " active" : ""}`}
+              onClick={() => setActiveTab("reviews")}
+            >
+              <span className="sidebar-nav-text">All Reviews</span>
+            </button>
+            <button
               className={`sidebar-nav-btn${activeTab === "admins" ? " active" : ""}`}
               onClick={() => setActiveTab("admins")}
             >

@@ -4,6 +4,7 @@ import Dashboard from "./Dashboard";
 import ViewLogs from "./ViewLogs";
 import ManageResearchers from "./ManageResearchers";
 import ManageReviewers from "./ManageReviewers";
+import ManageReviews from "./ManageReviews";
 import ManageAdmins from "./ManageAdmins";
 import SystemSettings from "./SystemSettings";
 import AdminProfile from "./AdminProfile";
@@ -21,6 +22,7 @@ export default function AdminPage() {
         {activeTab === "logs" && <ViewLogs />}
         {activeTab === "researchers" && <ManageResearchers />}
         {activeTab === "reviewers" && <ManageReviewers />}
+        {activeTab === "reviews" && <ManageReviews />}
         {activeTab === "admins" && <ManageAdmins />}
         {activeTab === "settings" && <SystemSettings />}
         {activeTab === "profile" && <AdminProfile />}

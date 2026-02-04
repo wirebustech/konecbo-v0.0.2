@@ -114,6 +114,23 @@ const createTables = async () => {
       );
       CREATE INDEX IF NOT EXISTS idx_listings_researcher_id ON listings(researcher_id);
     `);
+
+    // Reviews table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS reviews (
+        id SERIAL PRIMARY KEY,
+        listing_id INTEGER REFERENCES listings(id) ON DELETE CASCADE,
+        reviewer_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+        comments TEXT,
+        status VARCHAR(50) DEFAULT 'submitted', -- submitted, approved, rejected
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_reviews_listing_id ON reviews(listing_id);
+      CREATE INDEX IF NOT EXISTS idx_reviews_reviewer_id ON reviews(reviewer_id);
+    `);
+
     // Activity logs table
     await client.query(`
       CREATE TABLE IF NOT EXISTS activity_logs (

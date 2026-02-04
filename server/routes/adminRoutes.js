@@ -22,6 +22,9 @@ router.delete('/users/:id', adminController.deleteUser);
 // Get activity logs
 router.get('/logs', adminController.getActivityLogs);
 
+// Get all reviews
+router.get('/reviews', adminController.getAllReviews);
+
 // System Settings Management
 const adminSettingsController = require('../controllers/adminSettingsController');
 router.get('/settings', adminSettingsController.getAllSettings);

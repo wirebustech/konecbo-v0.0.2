@@ -110,6 +110,13 @@ const adminService = {
      */
     updateSetting: async (key, value) => {
         return await adminAPI.put('/settings', { key, value });
+    },
+
+    /**
+     * Get All Reviews
+     */
+    getAllReviews: async () => {
+        return await adminAPI.get('/reviews');
     }
 };
 

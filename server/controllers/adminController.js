@@ -237,3 +237,38 @@ exports.getActivityLogs = async (req, res) => {
         });
     }
 };
+
+/**
+ * Get all reviews (Admin View)
+ * @route GET /api/admin/reviews
+ */
+exports.getAllReviews = async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                r.id,
+                r.rating,
+                r.comments,
+                r.status,
+                r.created_at,
+                l.title as listing_title,
+                u.full_name as reviewer_name,
+                u.email as reviewer_email
+            FROM reviews r
+            LEFT JOIN listings l ON r.listing_id = l.id
+            LEFT JOIN users u ON r.reviewer_id = u.id
+            ORDER BY r.created_at DESC
+        `);
+
+        res.json({
+            success: true,
+            reviews: result.rows
+        });
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch reviews'
+        });
+    }
+};
