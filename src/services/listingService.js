@@ -1,9 +1,6 @@
 import axios from 'axios';
 
-// Use relative path in production to handle port mapping/ssl
-const API_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:5000/api'
-    : '/api';
+const API_URL = '/api';
 
 const api = axios.create({
     baseURL: API_URL,

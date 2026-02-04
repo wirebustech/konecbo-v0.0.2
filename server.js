@@ -13,7 +13,7 @@ const listingRoutes = require('./server/routes/listingRoutes');
 const researcherRoutes = require('./server/routes/researcherRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet({
