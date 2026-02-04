@@ -496,3 +496,76 @@ exports.logout = async (req, res) => {
         });
     }
 };
+// Update Credentials (Email/Password) - Primarily for Admins
+exports.updateCredentials = async (req, res) => {
+    const { email, password, newPassword } = req.body;
+    const userId = req.user.userId;
+
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+
+        // Verify current password first
+        const userCheck = await client.query('SELECT password_hash FROM users WHERE id = $1', [userId]);
+        if (userCheck.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const isMatch = await bcrypt.compare(password, userCheck.rows[0].password_hash);
+        if (!isMatch) {
+            await client.query('ROLLBACK');
+            return res.status(401).json({ success: false, message: 'Current password is incorrect' });
+        }
+
+        const updates = [];
+        const values = [];
+        let paramCount = 1;
+
+        if (email) {
+            // Check if email taken
+            const emailCheck = await client.query('SELECT id FROM users WHERE email = $1 AND id != $2', [email, userId]);
+            if (emailCheck.rows.length > 0) {
+                await client.query('ROLLBACK');
+                return res.status(400).json({ success: false, message: 'Email already in use' });
+            }
+            updates.push(`email = $${paramCount}`);
+            values.push(email);
+            paramCount++;
+        }
+
+        if (newPassword) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
+            updates.push(`password_hash = $${paramCount}`);
+            values.push(hashedPassword);
+            paramCount++;
+        }
+
+        if (updates.length > 0) {
+            values.push(userId); // Add ID as last param
+            await client.query(
+                `UPDATE users SET ${updates.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${paramCount}`,
+                values
+            );
+        }
+
+        await client.query('COMMIT');
+
+        res.json({
+            success: true,
+            message: 'Credentials updated successfully'
+        });
+
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('Update credentials error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error updating credentials'
+        });
+    } finally {
+        client.release();
+    }
+};

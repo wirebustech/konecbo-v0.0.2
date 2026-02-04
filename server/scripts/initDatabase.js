@@ -171,6 +171,22 @@ const createTables = async () => {
       ON CONFLICT (key) DO NOTHING;
     `);
 
+    // Create Default Admin User
+    const adminCheck = await client.query("SELECT * FROM users WHERE role = 'admin' LIMIT 1");
+    if (adminCheck.rows.length === 0) {
+      console.log('👤 Creating default admin user...');
+      const bcrypt = require('bcryptjs'); // Require here to avoid top-level dependency issues if package missing
+      const salt = await bcrypt.genSalt(10);
+      // Default: admin@konecbo.com / admin123
+      const hashedPassword = await bcrypt.hash('admin123', salt);
+
+      await client.query(`
+        INSERT INTO users (full_name, email, password_hash, role, email_verified, is_active)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, ['System Admin', 'admin@konecbo.com', hashedPassword, 'admin', true, true]);
+      console.log('✅ Default admin created: admin@konecbo.com / admin123');
+    }
+
     // Create indexes for better performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);

@@ -28,6 +28,7 @@ router.post('/google-auth', authController.googleAuth);
 // Protected routes (require authentication)
 router.get('/profile', authMiddleware, authController.getProfile);
 router.put('/profile', authMiddleware, authController.updateProfile);
+router.put('/update-credentials', authMiddleware, authController.updateCredentials);
 router.post('/logout', authMiddleware, authController.logout);
 
 module.exports = router;

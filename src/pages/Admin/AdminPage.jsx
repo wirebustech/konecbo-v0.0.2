@@ -5,7 +5,9 @@ import ViewLogs from "./ViewLogs";
 import ManageResearchers from "./ManageResearchers";
 import ManageReviewers from "./ManageReviewers";
 import ManageAdmins from "./ManageAdmins";
-import SystemSettings from "./SystemSettings"; // New
+import SystemSettings from "./SystemSettings";
+import AdminProfile from "./AdminProfile";
+import ReviewerPage from "../Reviewer/ReviewerPage"; // Integrating Reviewer Portal directly 
 import "./AdminPage.css";
 
 export default function AdminPage() {
@@ -20,7 +22,14 @@ export default function AdminPage() {
         {activeTab === "researchers" && <ManageResearchers />}
         {activeTab === "reviewers" && <ManageReviewers />}
         {activeTab === "admins" && <ManageAdmins />}
-        {activeTab === "settings" && <SystemSettings />} {/* New Tab */}
+        {activeTab === "settings" && <SystemSettings />}
+        {activeTab === "profile" && <AdminProfile />}
+        {activeTab === "reviewer_portal" && (
+          <div style={{ background: '#F0F2F5', minHeight: '100%', borderRadius: 8, padding: 10 }}>
+            {/* We wrap ReviewerPage to isolate scope if needed */}
+            <ReviewerPage adminView={true} />
+          </div>
+        )}
       </main>
     </div>
   );

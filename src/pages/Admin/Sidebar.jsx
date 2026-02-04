@@ -69,11 +69,24 @@ export default function Sidebar({ activeTab, setActiveTab }) {
             >
               <span className="sidebar-nav-text">System Settings</span>
             </button>
+            <button
+              className={`sidebar-nav-btn${activeTab === "reviewer_portal" ? " active" : ""}`}
+              onClick={() => setActiveTab("reviewer_portal")}
+            >
+              <span className="sidebar-nav-text">Reviewer Portal</span>
+            </button>
           </>
         )}
       </section>
       {!isCollapsed && (
         <footer>
+          <button
+            className={`sidebar-nav-btn${activeTab === "profile" ? " active" : ""}`}
+            onClick={() => setActiveTab("profile")}
+            style={{ marginBottom: 10, background: 'rgba(255,255,255,0.05)' }}
+          >
+            <span className="sidebar-nav-text">My Account</span>
+          </button>
           <button
             className="sidebar-logout-btn"
             onClick={handleLogout}
