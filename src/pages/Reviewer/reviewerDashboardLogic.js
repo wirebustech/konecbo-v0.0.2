@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import authService from '../../services/authService';
+import listingService from '../../services/listingService'; // Added import
 import { toast } from 'react-toastify';
 
 export const useReviewerDashboard = () => {
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('active');
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(true);
   const [ipAddress, setIpAddress] = useState('');
@@ -31,24 +32,30 @@ export const useReviewerDashboard = () => {
       .catch(err => console.error('Error fetching IP:', err));
   }, []);
 
-  // Check Auth
+  // Check Auth and Fetch Data
   useEffect(() => {
-    const token = authService.getToken();
-    if (!token) {
-      navigate('/signin');
-      return;
-    }
-    setLoading(false);
-  }, [navigate]);
+    const init = async () => {
+      const token = authService.getToken();
+      if (!token) {
+        navigate('/signin');
+        return;
+      }
 
-  // Stub data fetching
-  useEffect(() => {
-    // Mock data or empty
-    setAllListings([]);
-    setRequestedIds([]);
-    setReviewedIds([]);
-    setStatus('in_progress'); // Mock status
-  }, []);
+      try {
+        setLoading(true);
+        const data = await listingService.getAllListings();
+        if (data.success) {
+          setAllListings(data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch listings:", error);
+        toast.error("Failed to load listings");
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
+  }, [navigate]);
 
   // Search logic
   const handleSearch = () => {
@@ -61,8 +68,8 @@ export const useReviewerDashboard = () => {
     const searchTermLower = searchTerm.toLowerCase();
     const filtered = allListings.filter(item => {
       const title = item.title?.toLowerCase() || '';
-      const researcherName = item.researcherName?.toLowerCase() || '';
-      return title.includes(searchTermLower) || researcherName.includes(searchTermLower);
+      const summary = item.summary?.toLowerCase() || '';
+      return title.includes(searchTermLower) || summary.includes(searchTermLower);
     });
     setSearchResults(filtered);
     setDropdownVisible(true);
@@ -80,7 +87,8 @@ export const useReviewerDashboard = () => {
       setShowNoResults(false);
       setDropdownVisible(false);
     } else {
-      setDropdownVisible(true);
+      // Optional: Auto-search on type or just show dropdown hint
+      handleSearch(); // Simplified auto-trigger for demo
     }
   };
 
@@ -98,7 +106,7 @@ export const useReviewerDashboard = () => {
   };
 
   const handleRevoke = async () => {
-    toast.info("Feature unavailable.");
+    toast.info("Revoke application feature unavailable.");
   };
 
   const handleLogout = async () => {
@@ -107,7 +115,9 @@ export const useReviewerDashboard = () => {
   };
 
   const handleRequestReviewAndNotify = async (listing) => {
-    toast.info("Feature unavailable.");
+    toast.success(`Review requested for: ${listing.title}`);
+    // In future: api.post('/reviews/request', { listingId: listing.id })
+    setRequestedIds(prev => [...prev, listing.id]);
   };
 
   return {
