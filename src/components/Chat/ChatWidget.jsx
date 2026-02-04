@@ -32,15 +32,21 @@ const ChatWidget = ({ currentUserRole }) => {
 
     // Mock User List for Demo - In real app, fetch from API /users or /friends
     // If Admin, show researchers. If Researcher, show Admin + Peers.
-    const mockUsers = currentUserRole === 'admin'
-        ? [
-            { id: 2, name: 'Researcher Jane', role: 'researcher' },
-            { id: 3, name: 'Reviewer Bob', role: 'reviewer' }
-        ]
-        : [
-            { id: 1, name: 'System Admin', role: 'admin' }, // Assuming Admin is ID 1
-            { id: 2, name: 'Peer Researcher', role: 'researcher' }
-        ].filter(u => u.id !== currentUser?.id);
+    const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const data = await authService.getChatUsers();
+                if (data.success) {
+                    setUsers(data.users);
+                }
+            } catch (error) {
+                console.error("Failed to load chat users", error);
+            }
+        };
+        fetchUsers();
+    }, []);
 
     return (
         <Box sx={{ position: 'fixed', bottom: 30, right: 30, zIndex: 1000 }}>
@@ -97,7 +103,7 @@ const ChatWidget = ({ currentUserRole }) => {
                                         START A CONVERSATION
                                     </Typography>
                                 </Box>
-                                {mockUsers.map(user => (
+                                {users.map(user => (
                                     <React.Fragment key={user.id}>
                                         <ListItem button onClick={() => setActiveRecipient(user)}>
                                             <ListItemAvatar>
@@ -106,7 +112,7 @@ const ChatWidget = ({ currentUserRole }) => {
                                                 </Avatar>
                                             </ListItemAvatar>
                                             <ListItemText
-                                                primary={user.name}
+                                                primary={user.full_name || user.email}
                                                 secondary={user.role}
                                             />
                                         </ListItem>

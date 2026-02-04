@@ -29,6 +29,7 @@ router.post('/google-auth', authController.googleAuth);
 router.get('/profile', authMiddleware, authController.getProfile);
 router.put('/profile', authMiddleware, authController.updateProfile);
 router.put('/update-credentials', authMiddleware, authController.updateCredentials);
+router.get('/chat-users', authMiddleware, authController.getChatUsers);
 router.post('/logout', authMiddleware, authController.logout);
 
 module.exports = router;

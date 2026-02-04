@@ -142,6 +142,16 @@ const authService = {
     getToken: () => {
         return localStorage.getItem('authToken');
     },
+
+    // Get users for chat
+    getChatUsers: async () => {
+        try {
+            const response = await api.get('/auth/chat-users');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to fetch chat users' };
+        }
+    }
 };
 
 export default authService;

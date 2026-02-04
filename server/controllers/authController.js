@@ -569,3 +569,28 @@ exports.updateCredentials = async (req, res) => {
         client.release();
     }
 };
+
+// Get Users for Chat
+exports.getChatUsers = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+
+        // Fetch all active users except self
+        // In a real large app, you would filter this better (e.g. only friends or active conversations)
+        const result = await pool.query(`
+            SELECT id, full_name, role, email 
+            FROM users 
+            WHERE is_active = true AND id != $1
+            ORDER BY role ASC, full_name ASC
+            LIMIT 100
+        `, [userId]);
+
+        res.json({
+            success: true,
+            users: result.rows
+        });
+    } catch (error) {
+        console.error('Error fetching chat users:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
