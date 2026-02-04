@@ -96,6 +96,20 @@ const adminService = {
             console.error('Error fetching activity logs:', error);
             throw error;
         }
+    },
+
+    /**
+     * Get System Settings
+     */
+    getSettings: async () => {
+        return await adminAPI.get('/settings');
+    },
+
+    /**
+     * Update System Setting
+     */
+    updateSetting: async (key, value) => {
+        return await adminAPI.put('/settings', { key, value });
     }
 };
 

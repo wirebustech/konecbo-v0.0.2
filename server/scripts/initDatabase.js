@@ -150,6 +150,27 @@ const createTables = async () => {
       );
     `);
 
+    // System Settings Table (for Admin Control)
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS system_settings (
+        key VARCHAR(255) PRIMARY KEY,
+        value TEXT,
+        description TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Default Settings
+    await client.query(`
+      INSERT INTO system_settings (key, value, description)
+      VALUES 
+      ('google_docs_enabled', 'false', 'Enable Google Docs integration'),
+      ('google_client_id', '', 'Google OAuth Client ID'),
+      ('chat_enabled', 'false', 'Enable Chat feature'),
+      ('file_sharing_enabled', 'false', 'Enable File Sharing feature')
+      ON CONFLICT (key) DO NOTHING;
+    `);
+
     // Create indexes for better performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);

@@ -22,4 +22,9 @@ router.delete('/users/:id', adminController.deleteUser);
 // Get activity logs
 router.get('/logs', adminController.getActivityLogs);
 
+// System Settings Management
+const adminSettingsController = require('../controllers/adminSettingsController');
+router.get('/settings', adminSettingsController.getAllSettings);
+router.put('/settings', adminSettingsController.updateSetting);
+
 module.exports = router;

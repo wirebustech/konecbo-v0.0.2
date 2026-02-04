@@ -63,6 +63,12 @@ export default function Sidebar({ activeTab, setActiveTab }) {
             >
               <span className="sidebar-nav-text">Manage Admin</span>
             </button>
+            <button
+              className={`sidebar-nav-btn${activeTab === "settings" ? " active" : ""}`}
+              onClick={() => setActiveTab("settings")}
+            >
+              <span className="sidebar-nav-text">System Settings</span>
+            </button>
           </>
         )}
       </section>

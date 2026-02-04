@@ -1,25 +1,27 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Button, Paper } from '@mui/material';
+import React, { useState } from "react";
+import Sidebar from "./Sidebar";
+import Dashboard from "./Dashboard";
+import ViewLogs from "./ViewLogs";
+import ManageResearchers from "./ManageResearchers";
+import ManageReviewers from "./ManageReviewers";
+import ManageAdmins from "./ManageAdmins";
+import SystemSettings from "./SystemSettings"; // New
+import "./AdminPage.css";
 
-const AdminPage = () => {
-  const navigate = useNavigate();
+export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f7fafc', p: 5, textAlign: 'center' }}>
-      <Paper sx={{ p: 5, borderRadius: 4, maxWidth: 600, mx: 'auto' }}>
-        <Typography variant="h4" sx={{ color: '#132238', mb: 2, fontWeight: 700 }}>
-          Admin Portal Update
-        </Typography>
-        <Typography variant="body1" sx={{ color: '#555', mb: 4 }}>
-          The Admin Portal is currently undergoing scheduled maintenance for a database migration.
-        </Typography>
-        <Button variant="contained" onClick={() => navigate('/')} sx={{ bgcolor: '#64CCC5' }}>
-          Return to Home
-        </Button>
-      </Paper>
-    </Box>
+    <div className="admin-page-container" style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#1A2E40' }}>
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <main className="admin-content" style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
+        {activeTab === "dashboard" && <Dashboard />}
+        {activeTab === "logs" && <ViewLogs />}
+        {activeTab === "researchers" && <ManageResearchers />}
+        {activeTab === "reviewers" && <ManageReviewers />}
+        {activeTab === "admins" && <ManageAdmins />}
+        {activeTab === "settings" && <SystemSettings />} {/* New Tab */}
+      </main>
+    </div>
   );
-};
-
-export default AdminPage;
+}

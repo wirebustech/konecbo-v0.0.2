@@ -25,7 +25,17 @@ const getResearcherById = async (id) => {
 
 const researcherService = {
     getAllResearchers,
-    getResearcherById
+    getResearcherById,
+    getSystemConfig: async () => {
+        try {
+            const response = await axios.get(`${API_URL}/settings/config`);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching system config:", error);
+            // Return empty settings on error fallback
+            return { success: false, settings: {} };
+        }
+    }
 };
 
 export default researcherService;
