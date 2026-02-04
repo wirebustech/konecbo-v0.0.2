@@ -170,6 +170,22 @@ const createTables = async () => {
       CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at);
     `);
 
+    // Friendships table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS friendships (
+        id SERIAL PRIMARY KEY,
+        requester_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        addressee_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        status VARCHAR(50) DEFAULT 'pending', -- pending, accepted, rejected
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(requester_id, addressee_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_friendships_requester ON friendships(requester_id);
+      CREATE INDEX IF NOT EXISTS idx_friendships_addressee ON friendships(addressee_id);
+      CREATE INDEX IF NOT EXISTS idx_friendships_status ON friendships(status);
+    `);
+
     // Password reset tokens
     await client.query(`
       CREATE TABLE IF NOT EXISTS password_reset_tokens (

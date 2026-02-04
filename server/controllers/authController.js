@@ -575,13 +575,22 @@ exports.getChatUsers = async (req, res) => {
     try {
         const userId = req.user.userId;
 
-        // Fetch all active users except self
-        // In a real large app, you would filter this better (e.g. only friends or active conversations)
+        // Fetch:
+        // 1. Any Admin (for support)
+        // 2. Connected Friends (status = 'accepted')
         const result = await pool.query(`
-            SELECT id, full_name, role, email 
-            FROM users 
-            WHERE is_active = true AND id != $1
-            ORDER BY role ASC, full_name ASC
+            SELECT DISTINCT u.id, u.full_name, u.role, u.email 
+            FROM users u
+            LEFT JOIN friendships f1 ON (f1.requester_id = $1 AND f1.addressee_id = u.id)
+            LEFT JOIN friendships f2 ON (f2.addressee_id = $1 AND f2.requester_id = u.id)
+            WHERE u.is_active = true 
+            AND u.id != $1
+            AND (
+                u.role = 'admin' 
+                OR 
+                (f1.status = 'accepted' OR f2.status = 'accepted')
+            )
+            ORDER BY u.role ASC, u.full_name ASC
             LIMIT 100
         `, [userId]);
 
