@@ -133,7 +133,7 @@ const ResearcherHeader = ({
                     <MenuItem onClick={() => {
                         navigate(userInfo?.hasProfile ? '/researcher-profile' : '/researcher-edit-profile');
                     }}>
-                        View Profile
+                        My Profile
                     </MenuItem>
                     <MenuItem onClick={handleAddListing}>New Research</MenuItem>
                     <MenuItem onClick={() => navigate('/friends')}>Friends</MenuItem>
@@ -142,7 +142,7 @@ const ResearcherHeader = ({
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
             </nav>
-        </header>
+        </header >
     );
 };
 

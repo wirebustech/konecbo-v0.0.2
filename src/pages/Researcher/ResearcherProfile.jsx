@@ -73,7 +73,7 @@ const ResearcherProfile = () => {
 
   return (
     <Box sx={{ bgcolor: '#F1F8F4', minHeight: '100vh', pb: 8 }}>
-      <ResearcherHeader user={profile} pageTitle="Researcher Profile" />
+      <ResearcherHeader user={profile} pageTitle="My Profile" />
 
       <Box sx={{
         bgcolor: '#132238',

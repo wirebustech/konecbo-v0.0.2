@@ -296,7 +296,7 @@ const ResearcherDashboard = () => {
 
         {/* Listings Grid - Now horizontal scroll and reviewer card style */}
         <section style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <h2 style={{ marginBottom: 24, fontSize: '1.7rem', fontWeight: 700, color: 'var(--dark-blue)' }}>Your Research</h2>
+          <h2 style={{ marginBottom: 24, fontSize: '1.7rem', fontWeight: 700, color: 'var(--dark-blue)' }}>My Research</h2>
           <Box sx={{
             display: 'flex',
             flexDirection: 'row',
@@ -485,7 +485,7 @@ const ResearcherDashboard = () => {
 
         {/* Collaborations Section */}
         <section style={{ marginTop: 48, maxWidth: 1200, marginLeft: 'auto', marginRight: 'auto' }}>
-          <h2 style={{ marginBottom: 24, fontSize: '1.7rem', fontWeight: 700, color: 'var(--dark-blue)' }}>Your Collaborations</h2>
+          <h2 style={{ marginBottom: 24, fontSize: '1.7rem', fontWeight: 700, color: 'var(--dark-blue)' }}>My Collaborations</h2>
           <Box sx={{
             display: 'flex',
             flexDirection: 'row',

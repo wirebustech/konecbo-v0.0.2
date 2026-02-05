@@ -71,7 +71,7 @@ const EditProfile = () => {
       flexDirection: 'column'
     }}>
       {/* Header */}
-      <ResearcherHeader user={user} pageTitle="Edit Profile" />
+      <ResearcherHeader user={user} pageTitle="Edit My Profile" />
 
       {/* Breadcrumb / Back Link */}
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', maxWidth: 1200, mx: 'auto', mt: 2, width: '100%' }}>
@@ -87,7 +87,7 @@ const EditProfile = () => {
       {/* Header Info */}
       <Box sx={{ textAlign: 'center', mb: 2 }}>
         <Typography variant="h5" sx={{ fontWeight: 600, color: 'var(--dark-blue)' }}>
-          Edit Your Profile
+          Edit My Profile
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.8, color: '#555' }}>
           Update your research profile information
