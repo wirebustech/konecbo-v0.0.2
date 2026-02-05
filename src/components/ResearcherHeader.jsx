@@ -23,11 +23,13 @@ const ResearcherHeader = ({
     const [userInfo, setUserInfo] = useState(user || null);
 
     useEffect(() => {
-        if (!userInfo) {
+        if (user) {
+            setUserInfo(user);
+        } else if (!userInfo) {
             const u = authService.getCurrentUser();
             setUserInfo(u);
         }
-    }, [userInfo]);
+    }, [user]);
 
     const handleLogout = async () => {
         await authService.logout();
