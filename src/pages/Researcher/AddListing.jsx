@@ -81,9 +81,9 @@ function AddListing() {
   };
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--background-main, #f7fafc)' }}>
+    <main style={{ minHeight: '10vh', display: 'flex', flexDirection: 'column', background: 'var(--background-main, #f7fafc)' }}>
       {/* Header */}
-      <ResearcherHeader user={user} />
+      <ResearcherHeader user={user} pageTitle="Add New Listing" />
 
       {/* Breadcrumb / Back Link */}
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', maxWidth: 1200, mx: 'auto', mt: 2 }}>

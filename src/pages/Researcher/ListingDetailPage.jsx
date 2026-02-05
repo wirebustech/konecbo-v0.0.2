@@ -87,7 +87,7 @@ const ListingDetailPage = () => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f5f7fa', pb: 8 }}>
       {/* Header */}
-      <ResearcherHeader user={currentUser} />
+      <ResearcherHeader user={currentUser} pageTitle="Project Details" />
 
       {/* Breadcrumb / Back Link */}
       <Box sx={{ p: 2, display: 'flex', alignItems: 'center', maxWidth: 1200, mx: 'auto', mt: 2 }}>

@@ -83,7 +83,7 @@ const CollaboratePage = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#F1F8F4' }}>
-      <ResearcherHeader user={user} />
+      <ResearcherHeader user={user} pageTitle="Collaborate" />
 
       <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 2, md: 4 } }}>
         <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

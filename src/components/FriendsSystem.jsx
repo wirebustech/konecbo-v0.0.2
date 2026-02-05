@@ -62,7 +62,7 @@ const FriendsSystem = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f7fafc', pb: 4 }}>
-      <ResearcherHeader />
+      <ResearcherHeader pageTitle="My Connections" />
 
       <Box sx={{ maxWidth: 1000, mx: 'auto', p: 4 }}>
         {/* Sub Header */}

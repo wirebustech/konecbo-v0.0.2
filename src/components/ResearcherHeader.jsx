@@ -16,7 +16,8 @@ const ResearcherHeader = ({
     selectedMessage,
     onAccept,
     onReject,
-    onCloseSelected
+    onCloseSelected,
+    pageTitle // Optional prop to override welcome message
 }) => {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -75,12 +76,20 @@ const ResearcherHeader = ({
                 {/* Arrow Removed per request */}
 
                 <section>
-                    <h1 style={{ fontWeight: 700, fontSize: '2rem', margin: 0, letterSpacing: 0.5 }}>
-                        Welcome, {userName}
-                    </h1>
-                    <p style={{ color: 'var(--accent-teal)', margin: 0, fontSize: '1.1rem' }}>
-                        Manage your research and collaborate
-                    </p>
+                    {pageTitle ? (
+                        <h1 style={{ fontWeight: 700, fontSize: '2rem', margin: 0, letterSpacing: 0.5 }}>
+                            {pageTitle}
+                        </h1>
+                    ) : (
+                        <>
+                            <h1 style={{ fontWeight: 700, fontSize: '2rem', margin: 0, letterSpacing: 0.5 }}>
+                                Welcome, {userName}
+                            </h1>
+                            <p style={{ color: 'var(--accent-teal)', margin: 0, fontSize: '1.1rem' }}>
+                                Manage your research and collaborate
+                            </p>
+                        </>
+                    )}
                 </section>
             </nav>
 
