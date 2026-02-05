@@ -61,13 +61,13 @@ exports.getDashboardStats = async (req, res) => {
             GROUP BY role
         `);
 
-        // Get recent activity (last 7 days)
+        // Get recent activity (last 30 days)
         const activityStats = await pool.query(`
             SELECT 
-                DATE(created_at) as date,
+                DATE(created_at)::text as date,
                 COUNT(*) as count
             FROM activity_logs
-            WHERE created_at >= NOW() - INTERVAL '7 days'
+            WHERE created_at >= NOW() - INTERVAL '30 days'
             GROUP BY DATE(created_at)
             ORDER BY date ASC
         `);
@@ -75,8 +75,8 @@ exports.getDashboardStats = async (req, res) => {
         // Get login stats
         const loginStats = await pool.query(`
             SELECT 
-                COUNT(*) FILTER (WHERE action = 'login') as logins,
-                COUNT(*) FILTER (WHERE action = 'logout') as logouts
+                COUNT(*) FILTER (WHERE action = 'LOGIN') as logins,
+                COUNT(*) FILTER (WHERE action = 'LOGOUT') as logouts
             FROM activity_logs
             WHERE created_at >= NOW() - INTERVAL '30 days'
         `);

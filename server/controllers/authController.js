@@ -575,7 +575,21 @@ exports.getChatUsers = async (req, res) => {
     try {
         const userId = req.user.userId;
 
-        // Fetch:
+        // Check if current user is admin
+        if (req.user.role === 'admin') {
+            // Admin sees ALL active researchers + other admins
+            const result = await pool.query(`
+                SELECT id, full_name, role, email 
+                FROM users 
+                WHERE is_active = true AND id != $1
+                ORDER BY role ASC, full_name ASC
+                LIMIT 100
+            `, [userId]);
+
+            return res.json({ success: true, users: result.rows });
+        }
+
+        // Standard User (Researcher) Logic:
         // 1. Any Admin (for support)
         // 2. Connected Friends (status = 'accepted')
         const result = await pool.query(`

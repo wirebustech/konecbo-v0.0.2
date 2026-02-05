@@ -61,9 +61,8 @@ const styles = {
 
 export default function Dashboard() {
   const [totalUsers, setTotalUsers] = useState(0);
-  const [sqlUsers, setSqlUsers] = useState(0);
+  const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [logs, setLogs] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,8 +72,10 @@ export default function Dashboard() {
         try {
           const sqlStats = await adminService.getDashboardStats();
           const count = sqlStats.stats?.totalUsers || 0;
-          setSqlUsers(count);
+          const activity = sqlStats.stats?.recentActivity || [];
+
           setTotalUsers(count);
+          setChartData(activity);
         } catch (sqlError) {
           console.warn('SQL data fetch failed:', sqlError);
         }
@@ -103,9 +104,24 @@ export default function Dashboard() {
 
       <section style={styles.chartCard}>
         <header style={styles.chartHeader}>Engagement (Logs per Day)</header>
-        <div style={{ textAlign: "center", marginTop: "1rem", color: "#b1ede8" }}>
-          Chart unavailable (Maintenance)
-        </div>
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#445566" />
+              <XAxis dataKey="date" stroke="#B1EDE8" style={{ fontSize: '0.8rem' }} />
+              <YAxis stroke="#B1EDE8" />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#1A2E40', borderColor: '#64CCC5', color: '#fff' }}
+                itemStyle={{ color: '#64CCC5' }}
+              />
+              <Line type="monotone" dataKey="count" stroke="#64CCC5" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 8 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div style={{ textAlign: "center", marginTop: "4rem", color: "#8899aa" }}>
+            No activity data available yet.
+          </div>
+        )}
       </section>
     </section>
   );
