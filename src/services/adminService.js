@@ -60,14 +60,35 @@ const adminService = {
         }
     },
 
-    /**
-     * Update user role
-     */
     updateUserRole: async (userId, role, reason) => {
         try {
             return await adminAPI.put(`/users/${userId}/role`, { role, reason });
         } catch (error) {
             console.error('Error updating user role:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Suspend user
+     */
+    suspendUser: async (userId, reason) => {
+        try {
+            return await adminAPI.put(`/users/${userId}/suspend`, { reason });
+        } catch (error) {
+            console.error('Error suspending user:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Unsuspend user
+     */
+    unsuspendUser: async (userId, reason) => {
+        try {
+            return await adminAPI.put(`/users/${userId}/unsuspend`, { reason });
+        } catch (error) {
+            console.error('Error unsuspending user:', error);
             throw error;
         }
     },

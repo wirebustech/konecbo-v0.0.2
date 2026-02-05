@@ -16,6 +16,12 @@ router.get('/stats', adminController.getDashboardStats);
 // Update user role
 router.put('/users/:id/role', adminController.updateUserRole);
 
+// Suspend user
+router.put('/users/:id/suspend', adminController.suspendUser);
+
+// Unsuspend user
+router.put('/users/:id/unsuspend', adminController.unsuspendUser);
+
 // Delete user
 router.delete('/users/:id', adminController.deleteUser);
 

@@ -54,6 +54,49 @@ const ManageResearchers = () => {
     }
   };
 
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
+  const [unsuspendDialogOpen, setUnsuspendDialogOpen] = useState(false);
+  const [userToSuspend, setUserToSuspend] = useState(null);
+  const [userToUnsuspend, setUserToUnsuspend] = useState(null);
+  const [suspendReason, setSuspendReason] = useState('');
+  const [unsuspendReason, setUnsuspendReason] = useState('');
+
+  const handleSuspendClick = (user) => {
+    setUserToSuspend(user);
+    setSuspendReason('');
+    setSuspendDialogOpen(true);
+  };
+
+  const handleConfirmSuspend = async () => {
+    if (!userToSuspend) return;
+    try {
+      await adminService.suspendUser(userToSuspend.id, suspendReason);
+      toast.success("User suspended successfully");
+      setSuspendDialogOpen(false);
+      fetchUsers();
+    } catch (error) {
+      toast.error("Failed to suspend user");
+    }
+  };
+
+  const handleUnsuspendClick = (user) => {
+    setUserToUnsuspend(user);
+    setUnsuspendReason('');
+    setUnsuspendDialogOpen(true);
+  };
+
+  const handleConfirmUnsuspend = async () => {
+    if (!userToUnsuspend) return;
+    try {
+      await adminService.unsuspendUser(userToUnsuspend.id, unsuspendReason);
+      toast.success("User unsuspended successfully");
+      setUnsuspendDialogOpen(false);
+      fetchUsers();
+    } catch (error) {
+      toast.error("Failed to unsuspend user");
+    }
+  };
+
   const getRoleColor = (role) => {
     switch (role) {
       case 'admin': return 'error';
@@ -78,6 +121,7 @@ const ManageResearchers = () => {
               <TableCell sx={{ color: '#ccc' }}>Name</TableCell>
               <TableCell sx={{ color: '#ccc' }}>Email</TableCell>
               <TableCell sx={{ color: '#ccc' }}>Role</TableCell>
+              <TableCell sx={{ color: '#ccc' }}>Status</TableCell>
               <TableCell sx={{ color: '#ccc' }}>Institution</TableCell>
               <TableCell sx={{ color: '#ccc' }}>Joined</TableCell>
               <TableCell sx={{ color: '#ccc' }}>Actions</TableCell>
@@ -101,6 +145,14 @@ const ManageResearchers = () => {
                     variant="outlined"
                   />
                 </TableCell>
+                <TableCell>
+                  <Chip
+                    label={user.is_active ? 'Active' : 'Suspended'}
+                    size="small"
+                    color={user.is_active ? 'success' : 'error'}
+                    variant={user.is_active ? 'filled' : 'outlined'}
+                  />
+                </TableCell>
                 <TableCell sx={{ color: 'white' }}>{user.institution || '-'}</TableCell>
                 <TableCell sx={{ color: 'white' }}>
                   {new Date(user.created_at).toLocaleDateString()}
@@ -109,17 +161,38 @@ const ManageResearchers = () => {
                   <Button
                     variant="outlined"
                     size="small"
-                    sx={{ color: '#64CCC5', borderColor: '#64CCC5', mr: 1, '&:hover': { bgcolor: 'rgba(100,204,197,0.1)' } }}
+                    sx={{ color: '#64CCC5', borderColor: '#64CCC5', mr: 1, mb: 1, '&:hover': { bgcolor: 'rgba(100,204,197,0.1)' } }}
                     onClick={() => handleEditClick(user)}
                   >
                     Edit Role
                   </Button>
+                  {user.is_active ? (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="error"
+                      sx={{ mr: 1, mb: 1 }}
+                      onClick={() => handleSuspendClick(user)}
+                    >
+                      Suspend
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      color="success"
+                      sx={{ mr: 1, mb: 1 }}
+                      onClick={() => handleUnsuspendClick(user)}
+                    >
+                      Unsuspend
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
             {users.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} sx={{ color: 'white', textAlign: 'center', py: 3 }}>
+                <TableCell colSpan={7} sx={{ color: 'white', textAlign: 'center', py: 3 }}>
                   No users found
                 </TableCell>
               </TableRow>
@@ -159,6 +232,48 @@ const ManageResearchers = () => {
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
           <Button onClick={handleSaveRole} variant="contained" color="primary">Save Changes</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Suspend User Dialog */}
+      <Dialog open={suspendDialogOpen} onClose={() => setSuspendDialogOpen(false)}>
+        <DialogTitle>Suspend User: {userToSuspend?.name}</DialogTitle>
+        <DialogContent sx={{ minWidth: 400, pt: 2 }}>
+          <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+            Are you sure you want to suspend this user? They will not be able to log in.
+          </Typography>
+          <TextField
+            label="Reason for suspension"
+            fullWidth
+            value={suspendReason}
+            onChange={(e) => setSuspendReason(e.target.value)}
+            placeholder="E.g. Violation of terms"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSuspendDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleConfirmSuspend} variant="contained" color="error">Suspend</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Unsuspend User Dialog */}
+      <Dialog open={unsuspendDialogOpen} onClose={() => setUnsuspendDialogOpen(false)}>
+        <DialogTitle>Unsuspend User: {userToUnsuspend?.name}</DialogTitle>
+        <DialogContent sx={{ minWidth: 400, pt: 2 }}>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Are you sure you want to reactivate this user account?
+          </Typography>
+          <TextField
+            label="Reason for reactivation"
+            fullWidth
+            value={unsuspendReason}
+            onChange={(e) => setUnsuspendReason(e.target.value)}
+            placeholder="E.g. Issue resolved"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setUnsuspendDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleConfirmUnsuspend} variant="contained" color="success">Unsuspend</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -100,11 +100,106 @@ exports.getDashboardStats = async (req, res) => {
     }
 };
 
+// ... existing code ...
+
+/**
+ * Suspend user
+ * @route PUT /api/admin/users/:id/suspend
+ */
+exports.suspendUser = async (req, res) => {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    try {
+        const result = await pool.query(
+            `UPDATE users 
+             SET is_active = false, updated_at = CURRENT_TIMESTAMP 
+             WHERE id = $1 
+             RETURNING id, email, full_name, is_active`,
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Log the suspension
+        await pool.query(
+            `INSERT INTO activity_logs (user_id, action, details, ip_address)
+             VALUES ($1, $2, $3, $4)`,
+            [id, 'suspend_user', `User suspended. Reason: ${reason || 'N/A'}`, req.ip]
+        );
+
+        res.json({
+            success: true,
+            message: 'User suspended successfully',
+            user: result.rows[0]
+        });
+    } catch (error) {
+        console.error('Error suspending user:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to suspend user',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Unsuspend user
+ * @route PUT /api/admin/users/:id/unsuspend
+ */
+exports.unsuspendUser = async (req, res) => {
+    const { id } = req.params;
+    const { reason } = req.body;
+
+    try {
+        const result = await pool.query(
+            `UPDATE users 
+             SET is_active = true, updated_at = CURRENT_TIMESTAMP 
+             WHERE id = $1 
+             RETURNING id, email, full_name, is_active`,
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // Log the unsuspension
+        await pool.query(
+            `INSERT INTO activity_logs (user_id, action, details, ip_address)
+             VALUES ($1, $2, $3, $4)`,
+            [id, 'unsuspend_user', `User unsuspended. Reason: ${reason || 'N/A'}`, req.ip]
+        );
+
+        res.json({
+            success: true,
+            message: 'User unsuspended successfully',
+            user: result.rows[0]
+        });
+    } catch (error) {
+        console.error('Error unsuspending user:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to unsuspend user',
+            error: error.message
+        });
+    }
+};
+
 /**
  * Update user role
  * @route PUT /api/admin/users/:id/role
  */
 exports.updateUserRole = async (req, res) => {
+    // ... existing code ...
     const { id } = req.params;
     const { role, reason } = req.body;
 
