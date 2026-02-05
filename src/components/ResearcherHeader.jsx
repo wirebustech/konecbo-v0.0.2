@@ -37,7 +37,7 @@ const ResearcherHeader = ({
     const handleCollaborate = () => navigate('/researcher/collaborate');
     const handleAddListing = () => navigate('/researcher/add-listing');
 
-    const userName = userInfo?.full_name || userInfo?.name || 'Researcher';
+    const userName = userInfo?.full_name || userInfo?.fullName || userInfo?.name || 'Researcher';
     const hasProfile = true; // Simplified; assume true or check auth
 
     return (

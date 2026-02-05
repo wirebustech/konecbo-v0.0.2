@@ -67,7 +67,7 @@ export function useResearcherDashboard() {
       const user = authService.getCurrentUser();
       if (user) {
         setUserId(user.id || 'current-user');
-        setUserName(user.name || user.fullName || 'Researcher');
+        setUserName(user.name || user.fullName || user.full_name || 'Researcher');
 
         // We assume profile exists if user is logged in for now, or check via API
         setHasProfile(true);
