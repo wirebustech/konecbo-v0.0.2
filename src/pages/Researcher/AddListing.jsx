@@ -4,6 +4,8 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { toast } from 'react-toastify';
 import listingService from '../../services/listingService';
 import './ResearcherDashboard.css';
+import ResearcherHeader from '../../components/ResearcherHeader'; // Added
+import authService from '../../services/authService'; // Added
 import {
   TextField,
   Button,
@@ -42,6 +44,12 @@ function AddListing() {
     budget: '',
     deadline: ''
   });
+  const [user, setUser] = useState(null);
+
+  React.useEffect(() => {
+    const u = authService.getCurrentUser();
+    setUser(u);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -75,31 +83,28 @@ function AddListing() {
   return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--background-main, #f7fafc)' }}>
       {/* Header */}
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          background: 'linear-gradient(90deg, var(--dark-blue) 70%, var(--light-blue) 100%)',
-          color: 'var(--white)',
-          padding: '1.5rem 2rem',
-          boxShadow: '0 2px 12px rgba(30,60,90,0.08)'
-        }}
-      >
-        <IconButton
+      <ResearcherHeader user={user} />
+
+      {/* Breadcrumb / Back Link */}
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', maxWidth: 1200, mx: 'auto', mt: 2 }}>
+        <Button
+          startIcon={<ArrowBackIosIcon />}
           onClick={() => navigate(-1)}
-          sx={{ color: 'var(--white)', mr: 2 }}
+          color="inherit"
         >
-          <ArrowBackIosIcon />
-        </IconButton>
-        <section>
-          <h1 style={{ fontWeight: 700, fontSize: '1.8rem', margin: 0 }}>
-            New Research
-          </h1>
-          <p style={{ color: 'var(--accent-teal)', margin: 0, fontSize: '1rem', opacity: 0.9 }}>
-            Create a listing to find collaborators
-          </p>
-        </section>
-      </header>
+          Back
+        </Button>
+      </Box>
+
+      {/* Title */}
+      <Box sx={{ maxWidth: 'md', mx: 'auto', mt: 0, px: 3, width: '100%' }}>
+        <Typography variant="h4" fontWeight="700" color="var(--dark-blue)">
+          New Research
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Create a listing to find collaborators
+        </Typography>
+      </Box>
 
       {/* Main Form Content */}
       <Container maxWidth="md" sx={{ py: 6 }}>
