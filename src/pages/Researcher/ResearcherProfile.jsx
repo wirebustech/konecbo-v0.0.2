@@ -127,21 +127,6 @@ const ResearcherProfile = () => {
             <Grid item sx={{ display: 'flex', gap: 2 }}>
               {/* Actions for File Owner */}
               <Button
-                variant="outlined"
-                startIcon={<Share />}
-                sx={{
-                  color: 'white',
-                  borderColor: 'white',
-                  '&:hover': { borderColor: '#64CCC5', color: '#64CCC5' }
-                }}
-                onClick={() => {
-                  // Navigate to public view
-                  navigate(`/researcher/${profile.id}`);
-                }}
-              >
-                View Public
-              </Button>
-              <Button
                 variant="contained"
                 startIcon={<Edit />}
                 sx={{

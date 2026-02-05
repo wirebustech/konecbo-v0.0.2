@@ -35,7 +35,7 @@ import ChatRoom from "./pages/Researcher/ChatRoom";
 import FriendsSystem from './components/FriendsSystem';
 import CollaborationDashboard from "./pages/Researcher/CollaborationDashboard";
 import FriendProfile from "./components/FriendProfile";
-import PublicResearcherProfile from "./pages/Researcher/PublicResearcherProfile";
+// Removed duplicate import
 
 
 import axios from "axios";
@@ -170,7 +170,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/researcher/:id" element={<PublicResearcherProfile />} />
         <Route
           path="/listing/:id"
           element={
