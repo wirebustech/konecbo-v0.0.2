@@ -11,6 +11,8 @@ import {
 import authService from '../../services/authService';
 import { toast } from 'react-toastify';
 
+import ResearcherHeader from '../../components/ResearcherHeader'; // Added
+
 const ResearcherProfile = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -71,6 +73,8 @@ const ResearcherProfile = () => {
 
   return (
     <Box sx={{ bgcolor: '#F1F8F4', minHeight: '100vh', pb: 8 }}>
+      <ResearcherHeader user={profile} />
+
       <Box sx={{
         bgcolor: '#132238',
         color: 'white',
@@ -136,17 +140,6 @@ const ResearcherProfile = () => {
                 }}
               >
                 View Public
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{
-                  color: 'white',
-                  borderColor: 'white',
-                  '&:hover': { borderColor: '#64CCC5', color: '#64CCC5' }
-                }}
-                onClick={() => navigate('/researcher-dashboard')}
-              >
-                Dashboard
               </Button>
               <Button
                 variant="contained"
