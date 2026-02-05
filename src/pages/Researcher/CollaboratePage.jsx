@@ -5,12 +5,19 @@ import { Description, Folder, Chat, ArrowBackIos, Settings, Launch } from '@mui/
 import researcherService from '../../services/researcherService';
 import { toast } from 'react-toastify';
 
+import ResearcherHeader from '../../components/ResearcherHeader'; // Added
+import authService from '../../services/authService'; // Added
+
 const CollaboratePage = () => {
   const navigate = useNavigate();
   const [config, setConfig] = useState({});
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const u = authService.getCurrentUser();
+    setUser(u);
+
     const fetchConfig = async () => {
       try {
         const data = await researcherService.getSystemConfig();
@@ -33,7 +40,7 @@ const CollaboratePage = () => {
       return;
     }
     // Simulation of API/OAuth flow launch
-    window.open(`https://docs.google.com/document/create?usp=drive_web&client_id=${clientId}`, '_blank'); // Simplified example URL
+    window.open(`https://docs.google.com/document/create?usp=drive_web&client_id=${clientId}`, '_blank');
   };
 
   const tools = [
@@ -75,21 +82,14 @@ const CollaboratePage = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#F1F8F4', p: { xs: 2, md: 4 } }}>
-      <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
-        {/* Header */}
-        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Button
-            startIcon={<ArrowBackIos />}
-            onClick={() => navigate('/researcher-dashboard')}
-            sx={{ color: '#132238' }}
-          >
-            Dashboard
-          </Button>
-          <Typography variant="h4" sx={{ color: '#132238', fontWeight: 700, flex: 1, textAlign: 'center' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#F1F8F4' }}>
+      <ResearcherHeader user={user} />
+
+      <Box sx={{ maxWidth: 1200, mx: 'auto', p: { xs: 2, md: 4 } }}>
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Typography variant="h4" sx={{ color: '#132238', fontWeight: 700 }}>
             Collaboration Tools
           </Typography>
-          <Box sx={{ width: 100 }} /> {/* Spacer for centering */}
         </Box>
 
         <Grid container spacing={4}>
