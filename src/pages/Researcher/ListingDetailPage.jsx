@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react';
 import './ListingDetailPage.css';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { Box, Typography, Button, IconButton, CircularProgress, Chip, Paper, Grid, Divider } from '@mui/material';
+import ResearcherHeader from '../../components/ResearcherHeader'; // Added
 import authService from '../../services/authService';
 import listingService from '../../services/listingService';
-import friendService from '../../services/friendService'; // Added
+import friendService from '../../services/friendService';
 import { toast } from 'react-toastify';
 import PersonIcon from '@mui/icons-material/Person';
-import PersonAddIcon from '@mui/icons-material/PersonAdd'; // Added
-import CheckIcon from '@mui/icons-material/Check'; // Added
-import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty'; // Added
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import CheckIcon from '@mui/icons-material/Check';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 
@@ -85,12 +86,18 @@ const ListingDetailPage = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f5f7fa', pb: 8 }}>
-      {/* Header / Nav */}
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', maxWidth: 1200, mx: 'auto' }}>
-        <IconButton onClick={() => navigate(-1)} sx={{ mr: 2 }}>
-          <ArrowBackIosIcon />
-        </IconButton>
-        <Typography variant="h6" sx={{ color: '#555' }}>Back to Dashboard</Typography>
+      {/* Header */}
+      <ResearcherHeader user={currentUser} />
+
+      {/* Breadcrumb / Back Link */}
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', maxWidth: 1200, mx: 'auto', mt: 2 }}>
+        <Button
+          startIcon={<ArrowBackIosIcon />}
+          onClick={() => navigate(-1)}
+          color="inherit"
+        >
+          Back
+        </Button>
       </Box>
 
       {/* Content */}

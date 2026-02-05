@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import friendService from '../services/friendService';
 import { useChat } from '../contexts/ChatContext';
 import { toast } from 'react-toastify';
+import ResearcherHeader from './ResearcherHeader'; // Added
 
 const FriendsSystem = () => {
   const navigate = useNavigate();
@@ -41,28 +42,14 @@ const FriendsSystem = () => {
   }, []);
 
   const handleChat = (friend) => {
-    // Logic to open chat with this friend
-    // We can use context to set active recipient, then open widget
-    // But the widget is currently global. 
-    // Ideally, we navigate to Dashboard and auto-open chat, 
-    // OR we just assume ChatWidget is present here too (it is in Layout usually).
-
-    // Let's assume we want to navigate user to dashboard where chat is prominent 
-    // OR if this page has the widget, we trigger it.
-    // Since this is a dedicated page, we might want to just "Message" which opens the widget.
-
-    // We can simply use the context to set the chat and maybe open it if we had a way.
-    // For now, let's navigate to dashboard with state to open chat
     navigate('/researcher-dashboard');
-    // Note: Improving ChatWidget to listen to location state would be good, 
-    // but users can just open the widget manually.
     toast.info(`Open the chat bubble to message ${friend.full_name}`);
   };
 
   const handleDisconnect = async () => {
     if (!selectedFriend) return;
     try {
-      await friendService.removeFriend(selectedFriend.id); // Need to implement removeFriend in service
+      await friendService.removeFriend(selectedFriend.id);
       setFriends(prev => prev.filter(f => f.id !== selectedFriend.id));
       toast.success(`Disconnected from ${selectedFriend.full_name}`);
     } catch (error) {
@@ -74,9 +61,11 @@ const FriendsSystem = () => {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f7fafc', p: 4 }}>
-      <Box sx={{ maxWidth: 1000, mx: 'auto' }}>
-        {/* Header */}
+    <Box sx={{ minHeight: '100vh', bgcolor: '#f7fafc', pb: 4 }}>
+      <ResearcherHeader />
+
+      <Box sx={{ maxWidth: 1000, mx: 'auto', p: 4 }}>
+        {/* Sub Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
           <IconButton onClick={() => navigate('/researcher-dashboard')} sx={{ mr: 2 }}>
             <ArrowBackIosIcon />

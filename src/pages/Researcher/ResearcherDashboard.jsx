@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ResearcherDashboard.css';
 import axios from "axios";
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useResearcherDashboard } from './researcherDashboardLogic';
+import ResearcherHeader from '../../components/ResearcherHeader'; // Added
 // MUI Components
 import {
   Button,
@@ -20,10 +20,10 @@ import {
   Box,
   DialogActions,
   Stack,
-  Grid // Added
+  Grid
 } from '@mui/material';
 import { Notifications, Menu as MenuIcon, Close } from '@mui/icons-material';
-import PersonIcon from '@mui/icons-material/Person'; // Added
+import PersonIcon from '@mui/icons-material/Person';
 import CollaborationRequestsPanel from '../../components/CollaborationRequestsPanel';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ChatWidget from '../../components/Chat/ChatWidget';
@@ -33,124 +33,6 @@ function getFirstNSentences(text, n = 1) {
   const sentences = text.match(/[^.!?]+[.!?]+[\])'"`’”]*|.+/g) || [];
   return sentences.slice(0, n).join(" ");
 }
-
-const MessageNotification = ({ messages, unreadCount, onMessageClick, selectedMessage, onAccept, onReject, onCloseSelected, onClearNotifications }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-
-  return (
-    <Badge
-      color="error"
-      badgeContent={unreadCount}
-      sx={{
-        '& .MuiBadge-badge': {
-          right: 8,
-          top: 8
-        }
-      }}
-    >
-      <IconButton
-        color="inherit"
-        onClick={(e) => setAnchorEl(e.currentTarget)}
-        sx={{
-          color: '#B1EDE8',
-          '&:hover': { transform: 'scale(1.1)' }
-        }}
-      >
-        <Notifications />
-      </IconButton>
-
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => { setAnchorEl(null); onCloseSelected && onCloseSelected(); }}
-        PaperProps={{
-          sx: {
-            bgcolor: '#132238',
-            border: '1px solid #B1EDE8',
-            width: 350,
-            maxHeight: 500
-          }
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Box sx={{
-            display: 'flex',
-            color: '#B1EDE8',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '1px solid #2a3a57',
-            pb: 1,
-            mb: 2
-          }}>
-            <Typography variant="h6">Notifications</Typography>
-            <Box>
-              <Button
-                size="small"
-                variant="outlined"
-                sx={{ color: '#B1EDE8', borderColor: '#B1EDE8', mr: 1, minWidth: 0, px: 1 }}
-                onClick={() => {
-                  onClearNotifications && onClearNotifications();
-                  setAnchorEl(null);
-                  onCloseSelected && onCloseSelected();
-                }}
-              >
-                Mark as read
-              </Button>
-              <IconButton onClick={() => { setAnchorEl(null); onCloseSelected && onCloseSelected(); }} size="small">
-                <Close sx={{ color: '#B1EDE8' }} />
-              </IconButton>
-            </Box>
-          </Box>
-          {/* If a collaboration-request message is selected, show accept/reject UI */}
-          {selectedMessage && selectedMessage.type === 'collaboration-request' ? (
-            <Paper sx={{ p: 2, mb: 1, bgcolor: 'rgba(177, 237, 232, 0.05)' }}>
-              <Typography variant="subtitle1">{selectedMessage.title}</Typography>
-              <Typography variant="body2">{selectedMessage.content}</Typography>
-              <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                <Button variant="contained" color="success" onClick={() => { onAccept(selectedMessage); onCloseSelected && onCloseSelected(); }}>
-                  Accept
-                </Button>
-                <Button variant="contained" color="error" onClick={() => { onReject(selectedMessage); onCloseSelected && onCloseSelected(); }}>
-                  Reject
-                </Button>
-                <Button variant="outlined" onClick={() => { onCloseSelected && onCloseSelected(); }}>
-                  Close
-                </Button>
-              </Box>
-            </Paper>
-          ) : messages.length === 0 ? (
-            <Typography variant="body2" sx={{ textAlign: 'center' }}>
-              No new messages
-            </Typography>
-          ) : (
-            messages.map(message => (
-              <Paper
-                key={message.id}
-                sx={{
-                  p: 2,
-                  mb: 1,
-                  cursor: 'pointer',
-                  color: '#B1EDE8',
-                  bgcolor: message.read ? 'inherit' : 'rgba(177, 237, 232, 0.05)',
-                  '&:hover': { bgcolor: 'rgba(177, 237, 232, 0.1)' }
-                }}
-                onClick={() => {
-                  onMessageClick(message);
-                }}
-              >
-                <Typography variant="subtitle1">{message.title}</Typography>
-                <Typography variant="body2">{message.content}</Typography>
-                <Typography variant="caption" sx={{ color: '#7a8fb1' }}>
-                  {message.timestamp.toLocaleString()}
-                </Typography>
-              </Paper>
-            ))
-          )}
-        </Box>
-      </Menu>
-    </Badge>
-  );
-};
 
 const ResearcherDashboard = () => {
   const {
@@ -165,7 +47,7 @@ const ResearcherDashboard = () => {
     showNoResults,
     filteredListings, setFilteredListings,
     userName, setUserName,
-    friends, // Added
+    friends,
     setMessages,
 
     setIpAddress,
@@ -203,101 +85,19 @@ const ResearcherDashboard = () => {
 
   const navigate = useNavigate();
 
-  // Duplicate useEffects removed. Logic is handled in useResearcherDashboard hook.
-
-
-
   return (
     <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--background-main, #f7fafc)' }}>
       {/* Header */}
-      <header
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          background: 'linear-gradient(90deg, var(--dark-blue) 70%, var(--light-blue) 100%)',
-          color: 'var(--white)',
-          borderBottom: '2px solid var(--light-blue)',
-          padding: '1.5rem 2rem',
-          boxShadow: '0 2px 12px rgba(30,60,90,0.08)'
-        }}
-      >
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <img
-            src="/favicon.ico"
-            alt="Favicon"
-            style={{
-              width: 48,
-              height: 48,
-              marginRight: 16,
-              borderRadius: '50%',
-              border: '2.5px solid #B1EDE8',
-              objectFit: 'cover',
-              boxShadow: '0 2px 8px #5AA9A340'
-            }}
-          />
-          <IconButton onClick={() => navigate(-1)} sx={{ color: 'var(--white)' }}>
-            <ArrowBackIosIcon />
-          </IconButton>
-          <section>
-            <h1 style={{ fontWeight: 700, fontSize: '2rem', margin: 0, letterSpacing: 0.5 }}>
-              Welcome, {userName}
-            </h1>
-            <p style={{ color: 'var(--accent-teal)', margin: 0, fontSize: '1.1rem' }}>
-              Manage your research and collaborate
-            </p>
-          </section>
-        </nav>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <MessageNotification
-            messages={combinedNotifications}
-            unreadCount={combinedNotifications.filter(msg => !msg.read).length}
-            onMessageClick={handleMessageClick}
-            selectedMessage={selectedMessage}
-            onAccept={handleAcceptCollab}
-            onReject={handleRejectCollab}
-            onCloseSelected={() => setSelectedMessage(null)}
-            onClearNotifications={handleClearNotifications} // <-- add this
-          />
-          <IconButton
-            onClick={(e) => setAnchorEl(e.currentTarget)}
-            sx={{
-              bgcolor: 'var(--light-blue)',
-              color: 'var(--dark-blue)',
-              '&:hover': { bgcolor: '#5AA9A3' }
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={() => setAnchorEl(null)}
-            PaperProps={{
-              sx: {
-                bgcolor: 'var(--dark-blue)',
-                minWidth: 200,
-                color: 'var(--light-blue)',
-                borderRadius: '0.8rem'
-              }
-            }}
-          >
-            <MenuItem onClick={() => {
-              if (hasProfile) {
-                navigate('/researcher-profile');
-              } else {
-                navigate('/researcher-edit-profile');
-              }
-            }}>
-              View Profile
-            </MenuItem>
-            <MenuItem onClick={handleAddListing}>New Research</MenuItem>
-            <MenuItem onClick={() => navigate('/friends')}>Friends</MenuItem>
-            <MenuItem onClick={handleCollaborate}>Collaborate</MenuItem>
-            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-          </Menu>
-        </nav>
-      </header>
+      <ResearcherHeader
+        user={{ full_name: userName, hasProfile }}
+        notifications={combinedNotifications}
+        onMessageClick={handleMessageClick}
+        selectedMessage={selectedMessage}
+        onAccept={handleAcceptCollab}
+        onReject={handleRejectCollab}
+        onCloseSelected={() => setSelectedMessage(null)}
+        onClearNotifications={handleClearNotifications}
+      />
 
       {/* Main Content */}
       <section style={{ flex: 1, padding: 32, background: 'var(--background-main, #f7fafc)' }}>
