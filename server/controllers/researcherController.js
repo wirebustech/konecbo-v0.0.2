@@ -61,7 +61,9 @@ exports.getResearcherById = async (req, res) => {
 
         const result = await pool.query(`
             SELECT u.id, u.full_name, u.email, u.created_at,
-                   p.*
+                   p.*,
+                   (SELECT COUNT(*) FROM listings l WHERE l.researcher_id = u.id AND l.status = 'active') as contributor_stars,
+                   (SELECT COUNT(*) FROM collaborations c WHERE c.collaborator_id = u.id AND c.status = 'acknowledged') as collaborator_stars
             FROM users u
             JOIN user_profiles p ON u.id = p.user_id
             WHERE u.uid = $1 OR u.id::text = $1

@@ -102,6 +102,26 @@ const PublicResearcherProfile = () => {
                                 {profile.current_position || 'Researcher'}
                                 {profile.institution && ` at ${profile.institution}`}
                             </Typography>
+
+                            {/* Star Display */}
+                            <Box sx={{ display: 'flex', gap: 3, mb: 2 }}>
+                                {parseInt(profile.contributor_stars) > 0 && (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: 'rgba(255, 215, 0, 0.2)', px: 1, py: 0.5, borderRadius: 2 }}>
+                                        <Typography variant="h6">⭐</Typography>
+                                        <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#FFD700' }}>
+                                            {profile.contributor_stars} Contributor Star{profile.contributor_stars > 1 ? 's' : ''}
+                                        </Typography>
+                                    </Box>
+                                )}
+                                {parseInt(profile.collaborator_stars) > 0 && (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: 'rgba(76, 175, 80, 0.2)', px: 1, py: 0.5, borderRadius: 2 }}>
+                                        <Typography variant="h6">🤝</Typography>
+                                        <Typography variant="subtitle1" fontWeight="bold" sx={{ color: '#4CAF50' }}>
+                                            {profile.collaborator_stars} Collaborator Star{profile.collaborator_stars > 1 ? 's' : ''}
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, flexWrap: 'wrap' }}>
                                 {profile.country && (
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
