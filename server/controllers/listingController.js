@@ -154,3 +154,66 @@ exports.deleteListing = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error deleting listing' });
     }
 };
+// Get all pending listings (for reviewers)
+exports.getPendingListings = async (req, res) => {
+    try {
+        const query = `
+            SELECT l.*, u.full_name as "researcherName"
+            FROM listings l
+            JOIN users u ON l.researcher_id = u.id
+            WHERE l.status = 'pending'
+            ORDER BY l.created_at ASC
+        `;
+        const result = await pool.query(query);
+        res.json({ success: true, listings: result.rows });
+    } catch (error) {
+        console.error('Get pending listings error:', error);
+        res.status(500).json({ success: false, message: 'Server error fetching pending listings' });
+    }
+};
+
+// Reviewer actions: Approve Listing
+exports.approveListing = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const query = `
+            UPDATE listings 
+            SET status = 'active', updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            RETURNING *
+        `;
+        const result = await pool.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Listing not found' });
+        }
+
+        res.json({ success: true, listing: result.rows[0] });
+    } catch (error) {
+        console.error('Approve listing error:', error);
+        res.status(500).json({ success: false, message: 'Server error approving listing' });
+    }
+};
+
+// Reviewer actions: Reject Listing
+exports.rejectListing = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const query = `
+            UPDATE listings 
+            SET status = 'rejected', updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            RETURNING *
+        `;
+        const result = await pool.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Listing not found' });
+        }
+
+        res.json({ success: true, listing: result.rows[0] });
+    } catch (error) {
+        console.error('Reject listing error:', error);
+        res.status(500).json({ success: false, message: 'Server error rejecting listing' });
+    }
+};

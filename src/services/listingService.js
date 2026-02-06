@@ -77,6 +77,36 @@ const listingService = {
         } catch (error) {
             throw error.response?.data || { message: 'Network error' };
         }
+    },
+
+    // Get pending listings
+    getPendingListings: async () => {
+        try {
+            const response = await api.get('/listings/pending');
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Network error' };
+        }
+    },
+
+    // Approve listing
+    approveListing: async (id) => {
+        try {
+            const response = await api.put(`/listings/${id}/approve`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Network error' };
+        }
+    },
+
+    // Reject listing
+    rejectListing: async (id) => {
+        try {
+            const response = await api.put(`/listings/${id}/reject`);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Network error' };
+        }
     }
 };
 

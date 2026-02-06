@@ -16,8 +16,8 @@ const ReviewerPage = ({ adminView = false }) => {
     searchResults,
     handleInputChange,
     handleClear,
-    handleRequestReviewAndNotify,
-    requestedIds
+    handleApprove,
+    handleReject
   } = useReviewerDashboard();
 
   const displayListings = searchTerm ? searchResults : allListings;
@@ -58,11 +58,11 @@ const ReviewerPage = ({ adminView = false }) => {
         <Paper sx={{ p: 3, borderRadius: 3, mb: 4, boxShadow: adminView ? 'none' : '0 4px 20px rgba(0,0,0,0.05)' }}>
           <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
             <Typography variant="h6" fontWeight="bold" sx={{ mb: { xs: 2, md: 0 } }}>
-              Available Research Listings
+              Pending Listings (Require Vetting)
             </Typography>
 
             <TextField
-              placeholder="Search by title or keyword..."
+              placeholder="Search by title..."
               variant="outlined"
               size="small"
               value={searchTerm}
@@ -89,7 +89,7 @@ const ReviewerPage = ({ adminView = false }) => {
             <Box sx={{ textAlign: 'center', py: 8, color: '#888' }}>
               <Description sx={{ fontSize: 60, mb: 2, opacity: 0.5 }} />
               <Typography>
-                {searchTerm ? "No listings found matching your search." : "No active research listings available for review."}
+                {searchTerm ? "No listings found matching your search." : "No pending listings waiting for review."}
               </Typography>
             </Box>
           ) : (
@@ -128,20 +128,26 @@ const ReviewerPage = ({ adminView = false }) => {
                       }}>
                         {listing.summary}
                       </Typography>
+                      <Typography variant="caption" sx={{ color: 'orange', fontWeight: 'bold' }}>
+                        Status: Pending
+                      </Typography>
                     </CardContent>
-                    <CardActions sx={{ p: 2, pt: 0 }}>
+                    <CardActions sx={{ p: 2, pt: 0, justifyContent: 'space-between' }}>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleReject(listing.id)}
+                      >
+                        Reject
+                      </Button>
                       <Button
                         variant="contained"
-                        fullWidth
+                        color="success"
                         startIcon={<RateReview />}
-                        onClick={() => handleRequestReviewAndNotify(listing)}
-                        disabled={requestedIds.includes(listing.id)}
-                        sx={{
-                          bgcolor: requestedIds.includes(listing.id) ? '#ccc' : '#64CCC5',
-                          '&:hover': { bgcolor: '#5AA9A3' }
-                        }}
+                        onClick={() => handleApprove(listing.id)}
+                        sx={{ bgcolor: '#4CAF50', '&:hover': { bgcolor: '#45a049' } }}
                       >
-                        {requestedIds.includes(listing.id) ? 'Requested' : 'Review Project'}
+                        Approve
                       </Button>
                     </CardActions>
                   </Card>

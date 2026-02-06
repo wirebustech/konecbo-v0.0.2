@@ -43,13 +43,14 @@ export const useReviewerDashboard = () => {
 
       try {
         setLoading(true);
-        const data = await listingService.getAllListings();
+        // FETCH PENDING LISTINGS INSTEAD OF ACTIVE
+        const data = await listingService.getPendingListings();
         if (data.success) {
-          setAllListings(data.data || []);
+          setAllListings(data.listings || []);
         }
       } catch (error) {
         console.error("Failed to fetch listings:", error);
-        toast.error("Failed to load listings");
+        toast.error("Failed to load pending listings");
       } finally {
         setLoading(false);
       }
@@ -87,8 +88,7 @@ export const useReviewerDashboard = () => {
       setShowNoResults(false);
       setDropdownVisible(false);
     } else {
-      // Optional: Auto-search on type or just show dropdown hint
-      handleSearch(); // Simplified auto-trigger for demo
+      handleSearch();
     }
   };
 
@@ -114,14 +114,28 @@ export const useReviewerDashboard = () => {
     navigate('/signin');
   };
 
-  const handleRequestReviewAndNotify = async (listing) => {
-    toast.success(`Review requested for: ${listing.title}`);
-    // In future: api.post('/reviews/request', { listingId: listing.id })
-    setRequestedIds(prev => [...prev, listing.id]);
+  const handleApprove = async (listingId) => {
+    try {
+      await listingService.approveListing(listingId);
+      toast.success("Listing approved and live!");
+      // Remove from local list
+      setAllListings(prev => prev.filter(l => l.id !== listingId));
+    } catch (e) {
+      toast.error("Failed to approve listing");
+    }
+  };
+
+  const handleReject = async (listingId) => {
+    try {
+      await listingService.rejectListing(listingId);
+      toast.info("Listing rejected.");
+      setAllListings(prev => prev.filter(l => l.id !== listingId));
+    } catch (e) {
+      toast.error("Failed to reject listing");
+    }
   };
 
   return {
-    // State
     status,
     reason,
     loading,
@@ -136,17 +150,16 @@ export const useReviewerDashboard = () => {
     reviewedIds,
     sidebarOpen,
     menuAnchorEl,
-    // Setters
     setSidebarOpen,
     setMenuAnchorEl,
     setNotif,
-    // Handlers
     handleSearch,
     handleInputChange,
     handleInputFocus,
     handleClear,
     handleRevoke,
     handleLogout,
-    handleRequestReviewAndNotify,
+    handleApprove,
+    handleReject
   };
 };
