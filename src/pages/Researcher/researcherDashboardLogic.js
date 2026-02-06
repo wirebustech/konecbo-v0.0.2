@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import authService from '../../services/authService';
 import listingService from '../../services/listingService';
+import friendService from '../../services/friendService';
 import collaborationService from '../../services/collaborationService'; // Added
 import { toast } from 'react-toastify';
 
@@ -309,7 +310,6 @@ export function useResearcherDashboard() {
     anchorEl, setAnchorEl,
     selectedMessage, setSelectedMessage,
     cardMenuAnchor, setCardMenuAnchor,
-    cardMenuId, setCardMenuId,
     cardMenuId, setCardMenuId,
     showReviewersDialog, setShowReviewersDialog,
     showCollaboratorsDialog, setShowCollaboratorsDialog,

@@ -12,6 +12,8 @@ const adminRoutes = require('./server/routes/adminRoutes');
 const listingRoutes = require('./server/routes/listingRoutes');
 const researcherRoutes = require('./server/routes/researcherRoutes');
 const friendRoutes = require('./server/routes/friendRoutes');
+const collaborationRoutes = require('./server/routes/collaborationRoutes');
+
 
 const http = require('http');
 const { Server } = require("socket.io"); // Socket.io
@@ -55,6 +57,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/researchers', researcherRoutes);
 app.use('/api/friends', friendRoutes);
+app.use('/api/collaborations', collaborationRoutes);
+
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
