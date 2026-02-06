@@ -7,6 +7,7 @@ import ResearcherHeader from '../../components/ResearcherHeader'; // Added
 import authService from '../../services/authService';
 import listingService from '../../services/listingService';
 import friendService from '../../services/friendService';
+import collaborationService from '../../services/collaborationService';
 import { toast } from 'react-toastify';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -64,6 +65,20 @@ const ListingDetailPage = () => {
       setFriendStatus('sent');
     } catch (error) {
       toast.error(error.message || "Failed to send request");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleJoin = async () => {
+    if (!currentUser) return;
+    setActionLoading(true);
+    try {
+      await collaborationService.joinCollaboration(id);
+      toast.success("Successfully joined the project!");
+      navigate('/researcher-dashboard');
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to join project");
     } finally {
       setActionLoading(false);
     }
@@ -228,9 +243,10 @@ const ListingDetailPage = () => {
                       variant="contained"
                       fullWidth
                       sx={{ bgcolor: '#00897b', '&:hover': { bgcolor: '#00695c' } }}
-                    // onClick={() => navigate(`/collaboration/${id}`)}
+                      onClick={handleJoin}
+                      disabled={actionLoading}
                     >
-                      Request to Collaborate
+                      Join Project as Collaborator
                     </Button>
                   )}
                   <Button

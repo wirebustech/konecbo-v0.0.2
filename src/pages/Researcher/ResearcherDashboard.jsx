@@ -81,6 +81,11 @@ const ResearcherDashboard = () => {
     handleDropdownMouseEnter,
     handleDropdownMouseLeave,
     handleDeleteListing,
+    showCollaboratorsDialog, setShowCollaboratorsDialog,
+    collaboratorsForProject,
+    handleShowCollaborators,
+    handleAcknowledgeCollaborator,
+    myCollaborations
   } = useResearcherDashboard();
 
   const navigate = useNavigate();
@@ -97,6 +102,8 @@ const ResearcherDashboard = () => {
         onReject={handleRejectCollab}
         onCloseSelected={() => setSelectedMessage(null)}
         onClearNotifications={handleClearNotifications}
+        contributorStars={myListings ? myListings.filter(l => l.status === 'active').length : 0}
+        collaboratorStars={myCollaborations ? myCollaborations.filter(c => c.status === 'acknowledged').length : 0}
       />
 
       {/* Main Content */}
@@ -446,7 +453,59 @@ const ResearcherDashboard = () => {
             >
               See Reviewers
             </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleShowCollaborators(cardMenuId);
+              }}
+            >
+              Manage Collaborators
+            </MenuItem>
           </Menu>
+
+          {/* Collaborators Dialog */}
+          <Dialog
+            open={showCollaboratorsDialog}
+            onClose={() => setShowCollaboratorsDialog(false)}
+            PaperProps={{
+              sx: { bgcolor: '#fff', color: '#222', borderRadius: 2, minWidth: 400, maxWidth: 600 }
+            }}
+          >
+            <DialogTitle>Manage Collaborators</DialogTitle>
+            <DialogContent>
+              {collaboratorsForProject.length === 0 ? (
+                <Typography>No collaborators joined yet.</Typography>
+              ) : (
+                collaboratorsForProject.map(c => (
+                  <Box key={c.id} sx={{ mb: 2, p: 2, border: '1px solid #eee', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="subtitle1" fontWeight={700}>{c.full_name}</Typography>
+                      <Typography variant="body2">{c.email}</Typography>
+                      <Typography variant="caption" sx={{
+                        color: c.status === 'acknowledged' ? 'green' : 'orange',
+                        textTransform: 'uppercase',
+                        fontWeight: 600
+                      }}>
+                        {c.status}
+                      </Typography>
+                    </Box>
+                    {c.status !== 'acknowledged' && (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{ bgcolor: 'var(--light-blue)', color: 'var(--dark-blue)', fontWeight: 700 }}
+                        onClick={() => handleAcknowledgeCollaborator(c.id)}
+                      >
+                        Acknowledge Input
+                      </Button>
+                    )}
+                  </Box>
+                ))
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowCollaboratorsDialog(false)}>Close</Button>
+            </DialogActions>
+          </Dialog>
           {/* Reviewers Dialog */}
           <Dialog
             open={showReviewersDialog}

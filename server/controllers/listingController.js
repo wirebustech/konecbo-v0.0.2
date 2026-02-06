@@ -12,11 +12,11 @@ exports.createListing = async (req, res) => {
         }
 
         const query = `
-            INSERT INTO listings (researcher_id, title, summary, description, category, budget, deadline)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO listings (researcher_id, title, summary, description, category, budget, deadline, status)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             RETURNING *
         `;
-        const values = [researcher_id, title, summary, description, category, budget, deadline];
+        const values = [researcher_id, title, summary, description, category, budget, deadline, 'pending'];
         const result = await pool.query(query, values);
 
         res.status(201).json({ success: true, listing: result.rows[0] });
@@ -116,7 +116,7 @@ exports.updateListing = async (req, res) => {
             category,
             budget,
             deadline,
-            status || 'active',
+            status || 'pending',
             id
         ];
 

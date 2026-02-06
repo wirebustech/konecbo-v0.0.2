@@ -144,6 +144,22 @@ const createTables = async () => {
       );
     `);
 
+    // Collaborations table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS collaborations (
+        id SERIAL PRIMARY KEY,
+        listing_id INTEGER REFERENCES listings(id) ON DELETE CASCADE,
+        collaborator_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        status VARCHAR(50) DEFAULT 'active', -- active, completed, acknowledged
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(listing_id, collaborator_id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_collaborations_collaborator_id ON collaborations(collaborator_id);
+      CREATE INDEX IF NOT EXISTS idx_collaborations_listing_id ON collaborations(listing_id);
+    `);
+
+
     // Email verification tokens
     await client.query(`
       CREATE TABLE IF NOT EXISTS email_verification_tokens (

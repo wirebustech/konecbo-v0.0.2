@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Box, IconButton, Menu, MenuItem, Typography,
-    Button
+    Button, Tooltip
 } from '@mui/material';
-import { Menu as MenuIcon, Close } from '@mui/icons-material';
+import { Menu as MenuIcon, Close, Star as StarIcon, Handshake as HandshakeIcon, Info as InfoIcon } from '@mui/icons-material';
 import authService from '../services/authService';
 import MessageNotification from './MessageNotification';
+import StarSystemDialog from './StarSystemDialog';
 
 const ResearcherHeader = ({
     user,
@@ -17,11 +18,14 @@ const ResearcherHeader = ({
     onAccept,
     onReject,
     onCloseSelected,
-    pageTitle // Optional prop to override welcome message
+    pageTitle, // Optional prop to override welcome message
+    contributorStars = 0,
+    collaboratorStars = 0
 }) => {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState(null);
     const [userInfo, setUserInfo] = useState(user || null);
+    const [showStarInfo, setShowStarInfo] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -88,6 +92,60 @@ const ResearcherHeader = ({
                             <p style={{ color: 'var(--accent-teal)', margin: 0, fontSize: '1.1rem' }}>
                                 Manage your research and collaborate
                             </p>
+
+                            {/* Star System Display */}
+                            <Box sx={{ display: 'flex', gap: 2, mt: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                                <Tooltip title="Contributor Stars: Earned by posting research projects">
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        bgcolor: 'rgba(255,255,255,0.1)',
+                                        px: 1.5,
+                                        py: 0.5,
+                                        borderRadius: 4,
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        cursor: 'help'
+                                    }}>
+                                        <StarIcon sx={{ color: '#FFD700', fontSize: 20, mr: 0.8 }} />
+                                        <Typography fontWeight={700} fontSize="0.95rem" sx={{ color: '#fff' }}>
+                                            {contributorStars}
+                                        </Typography>
+                                    </Box>
+                                </Tooltip>
+
+                                <Tooltip title="Collaborator Stars: Earned by contributing to projects">
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        bgcolor: 'rgba(255,255,255,0.1)',
+                                        px: 1.5,
+                                        py: 0.5,
+                                        borderRadius: 4,
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        cursor: 'help'
+                                    }}>
+                                        <HandshakeIcon sx={{ color: '#4CAF50', fontSize: 20, mr: 0.8 }} />
+                                        <Typography fontWeight={700} fontSize="0.95rem" sx={{ color: '#fff' }}>
+                                            {collaboratorStars}
+                                        </Typography>
+                                    </Box>
+                                </Tooltip>
+
+                                <Button
+                                    startIcon={<InfoIcon />}
+                                    size="small"
+                                    sx={{
+                                        color: '#B1EDE8',
+                                        textTransform: 'none',
+                                        ml: 0.5,
+                                        fontStyle: 'italic',
+                                        '&:hover': { color: '#fff', bgcolor: 'rgba(255,255,255,0.1)' }
+                                    }}
+                                    onClick={() => setShowStarInfo(true)}
+                                >
+                                    What is this?
+                                </Button>
+                            </Box>
                         </>
                     )}
                 </section>
@@ -142,6 +200,11 @@ const ResearcherHeader = ({
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
                 </Menu>
             </nav>
+
+            <StarSystemDialog
+                open={showStarInfo}
+                onClose={() => setShowStarInfo(false)}
+            />
         </header >
     );
 };

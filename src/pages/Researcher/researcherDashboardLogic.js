@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import authService from '../../services/authService';
 import listingService from '../../services/listingService';
-import friendService from '../../services/friendService'; // Added
+import collaborationService from '../../services/collaborationService'; // Added
 import { toast } from 'react-toastify';
 
 export function useResearcherDashboard() {
@@ -14,6 +14,7 @@ export function useResearcherDashboard() {
   const [userId, setUserId] = useState(null);
   const [hasProfile, setHasProfile] = useState(false);
   const [collabListings, setCollabListings] = useState([]);
+  const [myCollaborations, setMyCollaborations] = useState([]); // Added for stars
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -31,7 +32,9 @@ export function useResearcherDashboard() {
   const [cardMenuAnchor, setCardMenuAnchor] = useState(null);
   const [cardMenuId, setCardMenuId] = useState(null);
   const [showReviewersDialog, setShowReviewersDialog] = useState(false);
+  const [showCollaboratorsDialog, setShowCollaboratorsDialog] = useState(false); // Added
   const [reviewersForProject, setReviewersForProject] = useState([]);
+  const [collaboratorsForProject, setCollaboratorsForProject] = useState([]); // Added
   const [reviewRequests, setReviewRequests] = useState([]);
   const [expandedSummaries, setExpandedSummaries] = useState({});
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -108,6 +111,13 @@ export function useResearcherDashboard() {
 
         const requestsData = await friendService.getRequests();
         setFriendRequests(requestsData.requests || []);
+
+        // Fetch My Collaborations (for stars)
+        try {
+          const collabData = await collaborationService.getMyCollaborations();
+          setMyCollaborations(collabData.collaborations || []);
+          setCollabListings(collabData.collaborations || []); // Use this for "My Collaborations" view too?
+        } catch (e) { console.error("Error fetching collaborations", e); }
 
       } catch (error) {
         console.error("Error loading dashboard data:", error);
@@ -300,8 +310,11 @@ export function useResearcherDashboard() {
     selectedMessage, setSelectedMessage,
     cardMenuAnchor, setCardMenuAnchor,
     cardMenuId, setCardMenuId,
+    cardMenuId, setCardMenuId,
     showReviewersDialog, setShowReviewersDialog,
+    showCollaboratorsDialog, setShowCollaboratorsDialog,
     reviewersForProject, setReviewersForProject,
+    collaboratorsForProject, setCollaboratorsForProject,
     reviewRequests, setReviewRequests,
     expandedSummaries, setExpandedSummaries,
     deleteDialogOpen, setDeleteDialogOpen,
@@ -324,9 +337,32 @@ export function useResearcherDashboard() {
     handleClearNotifications,
     combinedNotifications,
     handleShowReviewers,
+    handleShowCollaborators: async (listingId) => {
+      try {
+        const data = await collaborationService.getCollaborators(listingId);
+        setCollaboratorsForProject(data.collaborators || []);
+        setShowCollaboratorsDialog(true);
+        setCardMenuAnchor(null); // specific to usage in menu
+      } catch (e) {
+        toast.error("Failed to load collaborators");
+      }
+    },
+    handleAcknowledgeCollaborator: async (collaborationId) => {
+      try {
+        await collaborationService.acknowledgeCollaborator(collaborationId);
+        toast.success("Collaborator acknowledged! Star awarded.");
+        // Update local state
+        setCollaboratorsForProject(prev => prev.map(c =>
+          c.id === collaborationId ? { ...c, status: 'acknowledged' } : c
+        ));
+      } catch (e) {
+        toast.error("Failed to acknowledge collaborator");
+      }
+    },
     handleToggleSummary,
     handleDropdownMouseEnter,
     handleDropdownMouseLeave,
     handleDeleteListing,
+    myCollaborations
   };
 }
